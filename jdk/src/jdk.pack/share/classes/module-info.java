@@ -23,6 +23,6 @@
  * questions.
  */
 
-module jdk.pack200 {
+module jdk.pack {
 }
 
