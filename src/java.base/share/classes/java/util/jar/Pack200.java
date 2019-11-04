@@ -24,12 +24,13 @@
  */
 package java.util.jar;
 
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.SortedMap;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.File;
 import java.io.IOException;
-import sun.security.action.GetPropertyAction;
 
 
 /**
@@ -694,7 +695,11 @@ public abstract class Pack200 {
             Class<?> impl = (PACK_PROVIDER.equals(prop))? packerImpl: unpackerImpl;
             if (impl == null) {
                 // The first time, we must decide which class to use.
-                implName = GetPropertyAction.privilegedGetProperty(prop,"");
+                if (System.getSecurityManager() == null) {
+                    implName = System.getProperty(prop, "");
+                } else {
+                    implName = AccessController.doPrivileged((PrivilegedAction<String>) () -> System.getProperty(prop, ""));
+                }
                 if (implName != null && !implName.isEmpty())
                     impl = Class.forName(implName);
                 else if (PACK_PROVIDER.equals(prop))
