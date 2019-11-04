@@ -97,7 +97,7 @@ public class CommandLineTests {
         try {
             fos = new FileOutputStream(ConfigFile);
             ps = new PrintStream(fos);
-            ps.println("com.sun.java.util.jar.pack.debug.verbose=0");
+            ps.println("io.pack200.debug.verbose=0");
             ps.println("pack.modification.time=keep");
             ps.println("pack.keep.class.order=true");
             ps.println("pack.deflate.hint=false");

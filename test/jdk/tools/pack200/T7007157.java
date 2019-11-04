@@ -25,7 +25,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Map;
 import java.util.jar.JarFile;
-import java.util.jar.Pack200;
+import io.pack200.Pack200;
 /*
  * @test
  * @bug 7007157

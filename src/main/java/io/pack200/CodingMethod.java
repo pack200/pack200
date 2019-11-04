@@ -1,10 +1,12 @@
 /*
- * Copyright (c) 2017, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2003, 2010, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 only, as
- * published by the Free Software Foundation.
+ * published by the Free Software Foundation.  Oracle designates this
+ * particular file as subject to the "Classpath" exception as provided
+ * by Oracle in the LICENSE file that accompanied this code.
  *
  * This code is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
@@ -21,19 +23,21 @@
  * questions.
  */
 
+package io.pack200;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
 /**
- * @test
- * @bug 8179645
- * @run main/othervm SecurityTest
- * @summary Verify Pack200 initialization with security manager
+ * Interface for encoding and decoding int arrays using bytewise codes.
+ * @author John Rose
  */
+interface CodingMethod {
+    // Read and write an array of ints from/to a stream.
+    public void readArrayFrom(InputStream in, int[] a, int start, int end) throws IOException;
+    public void writeArrayTo(OutputStream out, int[] a, int start, int end) throws IOException;
 
-import io.pack200.Pack200;
-
-public class SecurityTest {
-    public static void main(String... args) {
-        System.setSecurityManager(new SecurityManager());
-        Pack200.newPacker();
-        Pack200.newUnpacker();
-    }
+    // how to express me in a band header?
+    public byte[] getMetaCoding(Coding dflt);
 }

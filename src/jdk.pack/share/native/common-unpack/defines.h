@@ -149,7 +149,7 @@ enum { false, true };
 // Keys used by Java:
 #define UNPACK_DEFLATE_HINT             "unpack.deflate.hint"
 
-#define COM_PREFIX                      "com.sun.java.util.jar.pack."
+#define COM_PREFIX                      "io.pack200."
 #define UNPACK_MODIFICATION_TIME        COM_PREFIX"unpack.modification.time"
 #define DEBUG_VERBOSE                   COM_PREFIX"verbose"
 

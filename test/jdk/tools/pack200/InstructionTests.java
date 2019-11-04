@@ -64,7 +64,7 @@ public class InstructionTests {
 
         File propsFile = new File("pack.props");
         scratch.clear();
-        scratch.add("com.sun.java.util.jar.pack.class.format.error=error");
+        scratch.add("io.pack200.class.format.error=error");
         scratch.add("pack.unknown.attribute=error");
         Utils.createFile(propsFile, scratch);
         // jar the file up

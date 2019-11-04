@@ -37,9 +37,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.jar.JarFile;
-import java.util.jar.Pack200;
-import java.util.jar.Pack200.Packer;
-import java.util.jar.Pack200.Unpacker;
+import io.pack200.Pack200;
+import io.pack200.Pack200.Packer;
+import io.pack200.Pack200.Unpacker;
 
 public class PackageVersionTest {
     private static final File  javaHome = new File(System.getProperty("java.home"));

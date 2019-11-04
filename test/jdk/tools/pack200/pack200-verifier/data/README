@@ -35,7 +35,7 @@ Test:
     Advanced: inspection of band contents
        Create a pack.conf as follows:
        % cat pack.conf
-       com.sun.java.util.jar.pack.dump.bands=true
+       io.pack200.dump.bands=true
 
        % pack200 --no-gzip --config-file=pack.conf \
            --verbose golden.jar.pack golden.jar

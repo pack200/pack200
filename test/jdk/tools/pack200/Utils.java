@@ -48,7 +48,7 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.jar.JarFile;
 import java.util.jar.JarOutputStream;
-import java.util.jar.Pack200;
+import io.pack200.Pack200;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
@@ -400,9 +400,9 @@ class Utils {
         cmdList.add("-ea");
         cmdList.add("-esa");
         if (disableNative) {
-            cmdList.add("-Dcom.sun.java.util.jar.pack.disable.native=true");
+            cmdList.add("-Dio.pack200.disable.native=true");
         }
-        cmdList.add("com.sun.java.util.jar.pack.Driver");
+        cmdList.add("io.pack200.Driver");
         cmdList.add("--repack");
         if (extraOpts != null) {
            for (String opt: extraOpts) {
@@ -457,7 +457,7 @@ class Utils {
         Pack200.Unpacker unpacker = Pack200.newUnpacker();
         Map<String, String> props = unpacker.properties();
         if (useJavaUnpack) {
-            props.put("com.sun.java.util.jar.pack.disable.native", "true");
+            props.put("io.pack200.disable.native", "true");
         }
         // Call the unpacker
         unpacker.unpack(inFile, jarStream);

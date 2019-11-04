@@ -47,10 +47,10 @@ public class BandIntegrity {
                 ".");
         List<String> scratch = new ArrayList<>();
         // band debugging works only with java unpacker
-        scratch.add("com.sun.java.util.jar.pack.disable.native=true");
-        scratch.add("com.sun.java.util.jar.pack.debug.bands=true");
+        scratch.add("io.pack200.disable.native=true");
+        scratch.add("io.pack200.debug.bands=true");
         // while at it, might as well exercise this functionality
-        scratch.add("com.sun.java.util.jar.pack.dump.bands=true");
+        scratch.add("io.pack200.dump.bands=true");
         scratch.add("pack.unknown.attribute=error");
         File configFile = new File("pack.conf");
         Utils.createFile(configFile, scratch);

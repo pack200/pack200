@@ -89,10 +89,10 @@ public class AttributeTests {
         String[] expectedStrings = {
             "WARNING: Passing class file uncompressed due to unrecognized" +
                     " attribute: Foo.class",
-            "INFO: com.sun.java.util.jar.pack.Attribute$FormatException: " +
+            "INFO: io.pack200.Attribute$FormatException: " +
                     "class attribute \"XourceFile\":  is unknown attribute " +
                     "in class Foo",
-            "INFO: com.sun.java.util.jar.pack.ClassReader$ClassFormatException: " +
+            "INFO: io.pack200.ClassReader$ClassFormatException: " +
                     "AnnotationDefault: attribute length cannot be zero, in Test.message()",
             "WARNING: Passing class file uncompressed due to unknown class format: Test.class"
         };

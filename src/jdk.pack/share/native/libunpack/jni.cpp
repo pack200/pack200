@@ -32,7 +32,7 @@
 
 #include <limits.h>
 
-#include <com_sun_java_util_jar_pack_NativeUnpack.h>
+#include <io_pack200_NativeUnpack.h>
 
 #include "jni_util.h"
 
@@ -177,7 +177,7 @@ static jlong read_input_via_jni(unpacker* self,
 }
 
 JNIEXPORT void JNICALL
-Java_com_sun_java_util_jar_pack_NativeUnpack_initIDs(JNIEnv *env, jclass clazz) {
+Java_io_pack200_NativeUnpack_initIDs(JNIEnv *env, jclass clazz) {
 #ifndef PRODUCT
   dbg = getenv("DEBUG_ATTACH");
   while( dbg != null) { sleep(10); }
@@ -200,7 +200,7 @@ Java_com_sun_java_util_jar_pack_NativeUnpack_initIDs(JNIEnv *env, jclass clazz) 
 }
 
 JNIEXPORT jlong JNICALL
-Java_com_sun_java_util_jar_pack_NativeUnpack_start(JNIEnv *env, jobject pObj,
+Java_io_pack200_NativeUnpack_start(JNIEnv *env, jobject pObj,
                                    jobject pBuf, jlong offset) {
   // try to get the unpacker pointer the hard way first, we do this to ensure
   // valid object pointers and env is intact, if not now is good time to bail.
@@ -240,7 +240,7 @@ Java_com_sun_java_util_jar_pack_NativeUnpack_start(JNIEnv *env, jobject pObj,
 }
 
 JNIEXPORT jboolean JNICALL
-Java_com_sun_java_util_jar_pack_NativeUnpack_getNextFile(JNIEnv *env, jobject pObj,
+Java_io_pack200_NativeUnpack_getNextFile(JNIEnv *env, jobject pObj,
                                          jobjectArray pParts) {
 
   unpacker* uPtr = get_unpacker(env, pObj);
@@ -290,7 +290,7 @@ Java_com_sun_java_util_jar_pack_NativeUnpack_getNextFile(JNIEnv *env, jobject pO
 
 
 JNIEXPORT jobject JNICALL
-Java_com_sun_java_util_jar_pack_NativeUnpack_getUnusedInput(JNIEnv *env, jobject pObj) {
+Java_io_pack200_NativeUnpack_getUnusedInput(JNIEnv *env, jobject pObj) {
   unpacker* uPtr = get_unpacker(env, pObj);
   CHECK_EXCEPTION_RETURN_VALUE(uPtr, NULL);
   unpacker::file* filep = &uPtr->cur_file;
@@ -313,7 +313,7 @@ Java_com_sun_java_util_jar_pack_NativeUnpack_getUnusedInput(JNIEnv *env, jobject
 }
 
 JNIEXPORT jlong JNICALL
-Java_com_sun_java_util_jar_pack_NativeUnpack_finish(JNIEnv *env, jobject pObj) {
+Java_io_pack200_NativeUnpack_finish(JNIEnv *env, jobject pObj) {
   unpacker* uPtr = get_unpacker(env, pObj, false);
   CHECK_EXCEPTION_RETURN_VALUE(uPtr, 0);
   size_t consumed = uPtr->input_consumed();
@@ -322,7 +322,7 @@ Java_com_sun_java_util_jar_pack_NativeUnpack_finish(JNIEnv *env, jobject pObj) {
 }
 
 JNIEXPORT jboolean JNICALL
-Java_com_sun_java_util_jar_pack_NativeUnpack_setOption(JNIEnv *env, jobject pObj,
+Java_io_pack200_NativeUnpack_setOption(JNIEnv *env, jobject pObj,
                                        jstring pProp, jstring pValue) {
   unpacker*   uPtr  = get_unpacker(env, pObj);
   CHECK_EXCEPTION_RETURN_VALUE(uPtr, false);
@@ -337,7 +337,7 @@ Java_com_sun_java_util_jar_pack_NativeUnpack_setOption(JNIEnv *env, jobject pObj
 }
 
 JNIEXPORT jstring JNICALL
-Java_com_sun_java_util_jar_pack_NativeUnpack_getOption(JNIEnv *env, jobject pObj,
+Java_io_pack200_NativeUnpack_getOption(JNIEnv *env, jobject pObj,
                                        jstring pProp) {
 
   unpacker*   uPtr  = get_unpacker(env, pObj);
