@@ -39,7 +39,6 @@ import java.util.zip.Deflater;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-@SuppressWarnings({"removal"})
 class NativeUnpack {
     // Pointer to the native unpacker obj
     private long unpackerPtr;

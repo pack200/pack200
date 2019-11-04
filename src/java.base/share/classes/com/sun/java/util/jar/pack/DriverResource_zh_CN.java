@@ -42,7 +42,6 @@ public class DriverResource_zh_CN extends ListResourceBundle {
     public static final String MORE_INFO = "MORE_INFO";
     public static final String DUPLICATE_OPTION = "DUPLICATE_OPTION";
     public static final String BAD_SPEC = "BAD_SPEC";
-    public static final String DEPRECATED = "DEPRECATED";
 
     /*
      * The following are the output of 'pack200' and 'unpack200' commands.
@@ -127,7 +126,6 @@ public class DriverResource_zh_CN extends ListResourceBundle {
         {MORE_INFO, "(\u6709\u5173\u8BE6\u7EC6\u4FE1\u606F, \u8BF7\u8FD0\u884C {0} --help\u3002)"}, // parameter 0:command name
         {DUPLICATE_OPTION, "\u91CD\u590D\u7684\u9009\u9879: {0}"}, // parameter 0:option
         {BAD_SPEC, "{0}\u7684\u89C4\u8303\u9519\u8BEF: {1}"}, // parameter 0:option;parameter 1:specifier
-        {DEPRECATED, "\n\u8B66\u544A\uFF1A{0} \u5DE5\u5177\u5DF2\u8FC7\u65F6\uFF0C\u8BA1\u5212\u5728\u672A\u6765\u7684 JDK \u53D1\u884C\u7248\u4E2D\u5220\u9664\u3002\n"} // parameter 0:command name
     };
 
     protected Object[][] getContents() {
