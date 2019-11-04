@@ -242,9 +242,9 @@ public class UnpackerImpl extends TLGlobals implements Pack200.Unpacker {
                     je.setCrc(crc.getValue());
                 }
                 if (keepModtime) {
-                    LocalDateTime ldt = LocalDateTime
-                            .ofEpochSecond(file.modtime, 0, ZoneOffset.UTC);
-                    je.setTimeLocal(ldt);
+                    je.setTime(file.modtime);
+                    // Convert back to milliseconds
+                    je.setTime((long)file.modtime * 1000);
                 } else {
                     je.setTime((long)modtime * 1000);
                 }
