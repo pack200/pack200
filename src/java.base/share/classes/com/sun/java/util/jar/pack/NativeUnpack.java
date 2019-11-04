@@ -87,7 +87,7 @@ class NativeUnpack {
         // If loading from stand alone build uncomment this.
         // System.loadLibrary("unpack");
         java.security.AccessController.doPrivileged(
-            new java.security.PrivilegedAction<>() {
+            new java.security.PrivilegedAction<Void>() {
                 public Void run() {
                     System.loadLibrary("unpack");
                     return null;
