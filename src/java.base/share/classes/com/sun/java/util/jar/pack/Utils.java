@@ -38,8 +38,9 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.JarInputStream;
 import java.util.jar.JarOutputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
-import sun.util.logging.PlatformLogger;
 
 class Utils {
     static final String COM_PREFIX = "com.sun.java.util.jar.pack.";
@@ -157,20 +158,20 @@ class Utils {
 
     static class Pack200Logger {
         private final String name;
-        private PlatformLogger log;
+        private Logger log;
         Pack200Logger(String name) {
             this.name = name;
         }
 
-        private synchronized PlatformLogger getLogger() {
+        private synchronized Logger getLogger() {
             if (log == null) {
-                log = PlatformLogger.getLogger(name);
+                log = Logger.getLogger(name);
             }
             return log;
         }
 
         public void warning(String msg, Object param) {
-                getLogger().warning(msg, param);
+                getLogger().log(Level.WARNING, msg, param);
             }
 
         public void warning(String msg) {
