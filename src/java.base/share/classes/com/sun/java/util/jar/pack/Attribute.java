@@ -716,7 +716,6 @@ class Attribute implements Comparable<Attribute> {
 
     public static
     class FormatException extends IOException {
-        @java.io.Serial
         private static final long serialVersionUID = -2542243830788066513L;
 
         private int ctype;

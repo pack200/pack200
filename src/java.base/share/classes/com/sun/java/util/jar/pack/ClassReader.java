@@ -605,7 +605,6 @@ class ClassReader {
     }
 
     static class ClassFormatException extends IOException {
-        @java.io.Serial
         private static final long serialVersionUID = -3564121733989501833L;
 
         public ClassFormatException(String message) {

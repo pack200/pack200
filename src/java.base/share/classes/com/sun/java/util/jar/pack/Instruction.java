@@ -679,7 +679,6 @@ class Instruction  {
         }
     }
     static class FormatException extends IOException {
-        @java.io.Serial
         private static final long serialVersionUID = 3175572275651367015L;
 
         FormatException(String message) {
