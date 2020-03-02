@@ -112,6 +112,97 @@
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>1.8</version>
+        <executions>
+          <execution>
+            <id>replace-version</id>
+            <phase>package</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <target>
+                <mkdir dir="${project.build.directory}/deb"/>
+                <copy todir="${project.build.directory}/deb" filtering="true">
+                  <fileset dir="src/deb"/>
+                  <filterset>
+                    <filter token="VERSION" value="${project.version}"/>
+                  </filterset>
+                </copy>
+              </target>
+            </configuration>
+          </execution>
+          <execution>
+            <id>make-rpm</id>
+            <phase>package</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <target>
+                <taskdef name="redline" classname="org.freecompany.redline.ant.RedlineTask" classpath="maven.plugin.classpath" />
+                
+                <redline destination="${project.build.directory}" group="Development/Tools" name="${project.artifactId}" version="${project.version}" url="${project.url}" preinstallscript="src/deb/control/preinst" postinstallscript="src/deb/control/postinst" preuninstallscript="src/deb/control/prerm">
+                  <tarfileset dir="${project.build.directory}/deb/data" />
+                  <tarfileset dir="${project.build.directory}" prefix="/usr/share/${project.artifactId}">
+                    <include name="${project.build.finalName}.jar" />
+                  </tarfileset>
+                  <depends name="java" version="&gt;= 1.8" />
+                </redline>
+              </target>
+            </configuration>
+          </execution>
+        </executions>
+        <dependencies>
+          <dependency>
+            <groupId>org.redline-rpm</groupId>
+            <artifactId>redline</artifactId>
+            <version>1.1.12</version>
+          </dependency>
+        </dependencies>
+      </plugin>
+      <plugin>
+        <artifactId>jdeb</artifactId>
+        <groupId>org.vafer</groupId>
+        <version>1.8</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>jdeb</goal>
+            </goals>
+            <configuration>
+              <snapshotExpand>true</snapshotExpand>
+              <attach>false</attach>
+              <dataSet>
+                <data>
+                  <type>file</type>
+                  <src>${project.build.directory}/${project.build.finalName}.jar</src>
+                  <mapper>
+                    <type>perm</type>
+                    <prefix>/usr/share/pack200</prefix>
+                  </mapper>
+                </data>
+                <data>
+                  <type>directory</type>
+                  <src>${project.build.directory}/deb/data</src>
+                </data>
+                <data>
+                  <type>directory</type>
+                  <src>src/jdk.pack/share/man/</src>
+                  <mapper>
+                    <type>perm</type>
+                    <prefix>/usr/share/pack200/man</prefix>
+                  </mapper>
+                </data>
+              </dataSet>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-release-plugin</artifactId>
         <version>2.5.3</version>
         <configuration>

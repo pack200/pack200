@@ -14,6 +14,7 @@ Pack200 source code extracted from OpenJDK just before its removal.
 ## Features
 * Supports class files formats up to the version 58 (Java 14)
 * Java 8 compatible
+* Installable package available for Linux (DEB and RPM)
 
 
 ## Changes

@@ -1,0 +1,20 @@
+#!/bin/sh
+
+set -e
+
+priority=1401
+basedir=/usr/share/pack200
+
+case "$1" in
+    configure)
+        update-alternatives --install /usr/bin/pack200   pack200   $basedir/pack200   $priority --slave /usr/share/man/man1/pack200.1   pack200.1   $basedir/man/pack200.1
+        update-alternatives --install /usr/bin/unpack200 unpack200 $basedir/unpack200 $priority --slave /usr/share/man/man1/unpack200.1 unpack200.1 $basedir/man/unpack200.1
+        chmod +x /usr/share/pack200/pack200
+        chmod +x /usr/share/pack200/unpack200
+        ;;
+
+esac
+
+#DEBHELPER#
+
+exit 0

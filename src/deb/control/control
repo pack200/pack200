@@ -1,0 +1,10 @@
+Package: pack200.io
+Version: [[version]]
+Section: utils
+Priority: optional
+Architecture: all
+Depends: default-jre-headless (>= 2:1.8) | java8-runtime-headless
+Recommends: bash-completion
+Maintainer: Emmanuel Bourg <ebourg@apache.org>
+Homepage: https://github.com/pack200/pack200
+Description: Pack200 - Optimized compression for JAR files

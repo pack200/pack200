@@ -1,0 +1,3 @@
+#!/bin/sh
+
+java -cp /usr/share/pack200/pack200-@VERSION@.jar io.pack200.Driver --unpack "$@"

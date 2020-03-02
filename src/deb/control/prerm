@@ -1,0 +1,10 @@
+#!/bin/sh
+
+set -e
+
+if [ "$1" = "remove" ] || [ "$1" = "deconfigure" ]; then
+    update-alternatives --remove pack200   /usr/share/pack200/pack200
+    update-alternatives --remove unpack200 /usr/share/pack200/unpack200
+fi
+
+#DEBHELPER#
