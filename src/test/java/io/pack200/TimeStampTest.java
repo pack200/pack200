@@ -35,6 +35,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.JarOutputStream;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 /*
@@ -55,6 +56,7 @@ public class TimeStampTest {
     static final TimeZone tz = TimeZone.getDefault();
 
     @Test
+    @Ignore("Requires Java 9 (ZipEntry.get/setLocalTime)")
     public void testTimestamps() throws IOException {
 
         // make a local copy of our test file
