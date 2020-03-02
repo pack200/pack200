@@ -104,7 +104,7 @@ public class PackerImpl  extends TLGlobals implements Pack200.Packer {
      * for the jar-manifest file and the directory containing the file.
      *
      * @see #MODIFICATION_TIME
-     * @see #DEFLATION_HINT
+     * @see #DEFLATE_HINT
      * @param in a JarInputStream
      * @param out an OutputStream
      * @exception IOException if an error is encountered.
