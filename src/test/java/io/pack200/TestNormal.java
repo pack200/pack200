@@ -33,12 +33,15 @@ package io.pack200;
 
 import java.io.*;
 
+import org.junit.Assume;
 import org.junit.Test;
 
 public class TestNormal {
 
     @Test
     public void testRoundTrip() throws Exception {
+        Assume.assumeTrue( Double.parseDouble(System.getProperty("java.specification.version")) < 14);
+
         String testdir = TestUtils.TEST_CLS_DIR.getAbsolutePath();
 
         try {

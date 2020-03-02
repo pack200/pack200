@@ -69,7 +69,7 @@ import static java.nio.file.StandardOpenOption.*;
  */
 public class TestUtils {
     static final String JavaHome = System.getProperty("test.java",
-            System.getProperty("java.home") + "/..");
+            System.getProperty("java.home").endsWith("jre") ? System.getProperty("java.home") + "/.." : System.getProperty("java.home"));
     static final boolean IsWindows =
             System.getProperty("os.name").startsWith("Windows");
     static final boolean Is64Bit =
@@ -188,6 +188,10 @@ public class TestUtils {
     };
 
     static void copyFile(File src, File dst) throws IOException {
+        if (dst.exists()) {
+            recursiveDelete(dst);
+        }
+
         Path parent = dst.toPath().getParent();
         if (parent != null) {
             Files.createDirectories(parent);

@@ -41,6 +41,7 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Assume;
 import org.junit.Test;
 /*
  * We try a potpouri of things ie. we have pack.conf to setup some
@@ -121,6 +122,8 @@ public class CommandLineTest {
     }
 
     static void runPack200(boolean jre) throws IOException {
+        Assume.assumeTrue("rt.jar doesn't exist", RtJar.exists());
+
         List<String> cmdsList = new ArrayList<String>();
         for (File f : jarList) {
             if (jre && f.getName().equals("tools.jar")) {
