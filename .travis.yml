@@ -1,0 +1,12 @@
+language: java
+jdk:
+  - openjdk-ea
+  - openjdk11
+  - openjdk8
+
+matrix:
+  allow_failures:
+    - jdk: openjdk-ea
+
+after_success:
+  - mvn clean cobertura:cobertura coveralls:report
