@@ -327,8 +327,8 @@ class PackageReader extends BandStructure {
         archive_header_S.doneDisbursing();
         archiveSize0 = in.getBytesServed();
 
-        int remainingHeaders = AH_LENGTH_MIN - AH_LENGTH_0 - AH_LENGTH_S;
-        if (haveFiles)    remainingHeaders += AH_FILE_HEADER_LEN;
+        int remainingHeaders = AH_LENGTH_MIN - AH_LENGTH_0;
+        if (haveFiles)    remainingHeaders += AH_FILE_HEADER_LEN - AH_LENGTH_S;
         if (haveSpecial)  remainingHeaders += AH_SPECIAL_FORMAT_LEN;
         if (haveNumbers)  remainingHeaders += AH_CP_NUMBER_LEN;
         if (haveCPExtra)  remainingHeaders += AH_CP_EXTRA_LEN;
