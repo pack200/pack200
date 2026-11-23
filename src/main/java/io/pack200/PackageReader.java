@@ -717,6 +717,15 @@ class PackageReader extends BandStructure {
         char[][] suffixChars = new char[len][];
         int bigSuffixCount = 0;
 
+        // Check the suffix lengths before sizing the cp_Utf8_chars band
+        for (int i = SUFFIX_SKIP_1; i < len; i++) {
+            int suffix = cp_Utf8_suffix.getInt();
+            if (Integer.toUnsignedLong(suffix) > (Integer.MAX_VALUE - 1) / 3) { // up to 3 bytes per char
+                throw new IOException("Suffix too large");
+            }
+        }
+        cp_Utf8_suffix.resetForSecondPass();
+
         // Third band:  Read the char values in the unshared suffixes:
         cp_Utf8_chars.expectLength(cp_Utf8_suffix.getIntTotal());
         cp_Utf8_chars.readFrom(in);
@@ -744,14 +753,24 @@ class PackageReader extends BandStructure {
         for (int i = 0; i < len; i++) {
             int suffix = (i < SUFFIX_SKIP_1)? 0: cp_Utf8_suffix.getInt();
             int prefix = (i < PREFIX_SKIP_2)? 0: cp_Utf8_prefix.getInt();
+            if (Integer.toUnsignedLong(prefix) > Integer.MAX_VALUE - suffix) {
+                throw new IOException("Bad utf8 prefix");
+            }
             if (suffix == 0 && i >= SUFFIX_SKIP_1) {
                 assert(suffixChars[i] == null);
                 suffix = cp_Utf8_big_suffix.getInt();
+                if (Integer.toUnsignedLong(suffix) > Integer.MAX_VALUE - prefix) {
+                    throw new IOException("Bad utf8 suffix");
+                }
             } else {
                 assert(suffixChars[i] != null);
             }
-            if (maxChars < prefix + suffix)
+            if (maxChars < prefix + suffix) { // has been verified to not overflow
                 maxChars = prefix + suffix;
+                if (maxChars > (Integer.MAX_VALUE - 1) / 3) { // up to 3 bytes per char
+                    throw new IOException("String too large");
+                }
+            }
         }
         char[] buf = new char[maxChars];
 
