@@ -46,6 +46,8 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <!-- Additional JVM options for the tests (set by the native and coverage profiles) -->
+    <argLine/>
   </properties>
 
   <build>
@@ -91,7 +93,7 @@
               <goal>test</goal>
             </goals>
             <configuration>
-              <argLine>-Xmx32m</argLine>
+              <argLine>@{argLine} -Xmx32m</argLine>
               <includes>
                 <include>**/*MemoryTest*</include>
               </includes>
@@ -238,6 +240,56 @@
   </build>
 
   <profiles>
+    <!-- Builds the native unpacker with CMake and runs the tests with it -->
+    <profile>
+      <id>native</id>
+      <properties>
+        <native.build.directory>${project.build.directory}/native/build</native.build.directory>
+        <argLine>-Djava.library.path=${native.build.directory}</argLine>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <version>3.5.0</version>
+            <executions>
+              <execution>
+                <id>cmake-configure</id>
+                <phase>process-classes</phase>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <configuration>
+                  <executable>cmake</executable>
+                  <arguments>
+                    <argument>-B</argument>
+                    <argument>${native.build.directory}</argument>
+                  </arguments>
+                </configuration>
+              </execution>
+              <execution>
+                <id>cmake-build</id>
+                <phase>process-classes</phase>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <configuration>
+                  <executable>cmake</executable>
+                  <arguments>
+                    <argument>--build</argument>
+                    <argument>${native.build.directory}</argument>
+                    <argument>--config</argument>
+                    <argument>Release</argument>
+                  </arguments>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
     <profile>
       <id>release</id>
       <build>

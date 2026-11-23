@@ -4,6 +4,8 @@
 #
 #   cmake -B target/native/build
 #   cmake --build target/native/build
+#
+# Alternatively 'mvn -Pnative test' builds the native unpacker and runs the tests with it.
 
 cmake_minimum_required(VERSION 3.20)
 
