@@ -207,20 +207,20 @@ class ClassWriter {
                         m);
     }
 
+    /**
+     * Moves the BootstrapMethods and InnerClasses attributes at the end, in this order,
+     * as required by the specification (7.1, Ordering of Attribute Lists).
+     */
     private void reorderBSMandICS(Attribute.Holder h) {
-        Attribute bsmAttr = h.getAttribute(Package.attrBootstrapMethodsEmpty);
-        if (bsmAttr == null) return;
+        moveToEnd(h, h.getAttribute(Package.attrBootstrapMethodsEmpty));
+        moveToEnd(h, h.getAttribute(Package.attrInnerClassesEmpty));
+    }
 
-        Attribute icsAttr = h.getAttribute(Package.attrInnerClassesEmpty);
-        if (icsAttr == null) return;
-
-        int bsmidx = h.attributes.indexOf(bsmAttr);
-        int icsidx = h.attributes.indexOf(icsAttr);
-        if (bsmidx > icsidx) {
-            h.attributes.remove(bsmAttr);
-            h.attributes.add(icsidx, bsmAttr);
+    private static void moveToEnd(Attribute.Holder h, Attribute a) {
+        if (a != null && h.attributes.get(h.attributes.size() - 1) != a) {
+            h.removeAttribute(a);
+            h.addAttribute(a);
         }
-        return;
     }
 
     // handy buffer for collecting attrs
