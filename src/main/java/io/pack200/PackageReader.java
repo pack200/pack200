@@ -803,6 +803,7 @@ class PackageReader extends BandStructure {
         cp_Utf8_prefix.resetForSecondPass();
         cp_Utf8_suffix.resetForSecondPass();
         cp_Utf8_big_suffix.resetForSecondPass();
+        int prevLength = 0;  // previous string length
         for (int i = 0; i < len; i++) {
             int prefix = (i < PREFIX_SKIP_2)? 0: cp_Utf8_prefix.getInt();
             int suffix = (i < SUFFIX_SKIP_1)? 0: cp_Utf8_suffix.getInt();
@@ -810,9 +811,14 @@ class PackageReader extends BandStructure {
                 suffix = cp_Utf8_big_suffix.getInt();
 
             // by induction, the buffer is already filled with the prefix
+            // make sure the prefix value is not corrupted, though:
+            if (prefix > prevLength) {
+                throw new IOException("Utf8 prefix overflow");
+            }
             System.arraycopy(suffixChars[i], 0, buf, prefix, suffix);
 
             cpMap[i] = ConstantPool.getUtf8Entry(new String(buf, 0, prefix+suffix));
+            prevLength = prefix + suffix;
         }
 
         cp_Utf8_prefix.doneDisbursing();

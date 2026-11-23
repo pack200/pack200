@@ -82,4 +82,17 @@ public class MalformedArchiveTest {
         IOException e = assertThrows(IOException.class, archive::unpack);
         assertEquals("String too large", e.getMessage());
     }
+
+    @Test
+    public void testUtf8PrefixLongerThanPreviousString() throws Exception {
+        Pack200Builder archive = new Pack200Builder()
+                .header(new HeaderBuilder().count(CONSTANT_Utf8, 4))
+                .band(DELTA5, 0, 5)          // cp_Utf8_prefix
+                .band(UNSIGNED5, 1, 1, 1)    // cp_Utf8_suffix
+                .band(CHAR3, 'a', 'b', 'c')  // cp_Utf8_chars
+                .band(DELTA5);               // cp_Utf8_big_suffix
+
+        IOException e = assertThrows(IOException.class, archive::unpack);
+        assertEquals("Utf8 prefix overflow", e.getMessage());
+    }
 }
