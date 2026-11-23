@@ -336,17 +336,17 @@ class PackageReader extends BandStructure {
         archive_header_1.readFrom(in);
 
         if (haveFiles) {
-            archiveNextCount = archive_header_1.getInt();
+            archiveNextCount = checkCount(archive_header_1.getInt());
             pkg.default_modtime = archive_header_1.getInt();
-            numFiles = archive_header_1.getInt();
+            numFiles = checkCount(archive_header_1.getInt());
         } else {
             archiveNextCount = 0;
             numFiles = 0;
         }
 
         if (haveSpecial) {
-            band_headers.expectLength(archive_header_1.getInt());
-            numAttrDefs = archive_header_1.getInt();
+            band_headers.expectLength(checkCount(archive_header_1.getInt()));
+            numAttrDefs = checkCount(archive_header_1.getInt());
         } else {
             band_headers.expectLength(0);
             numAttrDefs = 0;
@@ -354,12 +354,12 @@ class PackageReader extends BandStructure {
 
         readConstantPoolCounts(haveNumbers, haveCPExtra);
 
-        numInnerClasses = archive_header_1.getInt();
+        numInnerClasses = checkCount(archive_header_1.getInt());
 
         minver = (short) archive_header_1.getInt();
         majver = (short) archive_header_1.getInt();
         pkg.defaultClassVersion = Package.Version.of(majver, minver);
-        numClasses = archive_header_1.getInt();
+        numClasses = checkCount(archive_header_1.getInt());
 
         archive_header_1.doneDisbursing();
 
@@ -427,8 +427,16 @@ class PackageReader extends BandStructure {
                     continue;
                 }
             }
-            tagCount[tag] = archive_header_1.getInt();
+            tagCount[tag] = checkCount(archive_header_1.getInt());
         }
+    }
+
+    /** Rejects the archive header counts above Integer.MAX_VALUE */
+    private static int checkCount(int count) throws IOException {
+        if (Integer.toUnsignedLong(count) > Integer.MAX_VALUE) {
+            throw new IOException("Bad value count");
+        }
+        return count;
     }
 
     protected Index getCPIndex(byte tag) {

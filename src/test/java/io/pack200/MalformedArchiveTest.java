@@ -35,6 +35,17 @@ import static org.junit.Assert.*;
 public class MalformedArchiveTest {
 
     @Test
+    public void testConstantPoolCountAboveIntegerMax() throws Exception {
+        Pack200Builder archive = new Pack200Builder()
+                .header(new HeaderBuilder()
+                        .count(CONSTANT_Utf8, 1)
+                        .count(CONSTANT_String, -1));   // 2^32 - 1 in the archive, -1 once read as an int
+
+        IOException e = assertThrows(IOException.class, archive::unpack);
+        assertEquals("Bad value count", e.getMessage());
+    }
+
+    @Test
     public void testUtf8PrefixAboveIntegerMax() throws Exception {
         Pack200Builder archive = new Pack200Builder()
                 .header(new HeaderBuilder().count(CONSTANT_Utf8, 4))
