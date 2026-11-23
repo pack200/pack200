@@ -102,9 +102,8 @@ public class TestUtils {
     static void doCompareVerify(File reference, File specimen) throws IOException {
         List<String> cmds = new ArrayList<String>();
         cmds.add(getJavaCmd());
-        //cmds.add("--add-exports=jdk.jdeps/com.sun.tools.classfile=ALL-UNNAMED");
         cmds.add("-cp");
-        cmds.add("target/test-classes");
+        cmds.add(System.getProperty("java.class.path")); // the verifier needs ASM
         cmds.add("sun.tools.pack.verify.Main");
         cmds.add(reference.getAbsolutePath());
         cmds.add(specimen.getAbsolutePath());
@@ -117,7 +116,7 @@ public class TestUtils {
         List<String> cmds = new ArrayList<String>();
         cmds.add(getJavaCmd());
         cmds.add("-cp");
-        cmds.add("target/test-classes");
+        cmds.add(System.getProperty("java.class.path")); // the verifier needs ASM
         cmds.add("sun.tools.pack.verify.Main");
         cmds.add(reference.getAbsolutePath());
         cmds.add(specimen.getAbsolutePath());

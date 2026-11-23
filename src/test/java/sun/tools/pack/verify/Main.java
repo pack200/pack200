@@ -28,7 +28,7 @@ import java.io.*;
 /**
  * This class provides a convenient entry point to the pack200 verifier. This
  * compares two classes, either in path or in an archive.
- * @see xmlkit.XMLKit
+ * @see ClassCompare
  * @author ksrini
  */
 public class Main {
