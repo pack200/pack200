@@ -839,6 +839,9 @@ class PackageReader extends BandStructure {
         for (int i = 0; i < cpMap.length; i++) {
             Utf8Entry formRef = (Utf8Entry) cp_Signature_form.getRef();
             numSigClasses[i] = ConstantPool.countClassParts(formRef);
+            if (numSigClasses[i] >= 0xFFFF) {
+                throw new IOException("Too many class references");
+            }
         }
         cp_Signature_form.resetForSecondPass();
         cp_Signature_classes.expectLength(getIntTotal(numSigClasses));

@@ -20,6 +20,7 @@
 package io.pack200;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import org.junit.Test;
 
@@ -94,5 +95,24 @@ public class MalformedArchiveTest {
 
         IOException e = assertThrows(IOException.class, archive::unpack);
         assertEquals("Utf8 prefix overflow", e.getMessage());
+    }
+
+    @Test
+    public void testTooManySignatureClassReferences() throws Exception {
+        int[] chars = new int[0xFFFF];
+        Arrays.fill(chars, 'L');
+
+        Pack200Builder archive = new Pack200Builder()
+                .header(new HeaderBuilder()
+                        .count(CONSTANT_Utf8, 2)
+                        .count(CONSTANT_Signature, 1))
+                .band(DELTA5)                    // cp_Utf8_prefix
+                .band(UNSIGNED5, chars.length)   // cp_Utf8_suffix
+                .band(CHAR3, chars)              // cp_Utf8_chars
+                .band(DELTA5)                    // cp_Utf8_big_suffix
+                .band(DELTA5, 1);                // cp_Signature_form
+
+        IOException e = assertThrows(IOException.class, archive::unpack);
+        assertEquals("Too many class references", e.getMessage());
     }
 }
