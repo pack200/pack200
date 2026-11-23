@@ -90,12 +90,10 @@ class NativeUnpack {
     private  PropMap _props;
 
     static {
-        // If loading from stand alone build uncomment this.
-        // System.loadLibrary("unpack");
         java.security.AccessController.doPrivileged(
             new java.security.PrivilegedAction<Void>() {
                 public Void run() {
-                    System.loadLibrary("unpack");
+                    System.loadLibrary("pack200");
                     return null;
                 }
             });
