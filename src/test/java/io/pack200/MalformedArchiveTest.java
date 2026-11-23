@@ -115,4 +115,20 @@ public class MalformedArchiveTest {
         IOException e = assertThrows(IOException.class, archive::unpack);
         assertEquals("Too many class references", e.getMessage());
     }
+
+    @Test
+    public void testTooManyBootstrapMethodArguments() throws Exception {
+        int argc = 0xFFFF;
+
+        Pack200Builder archive = new Pack200Builder()
+                .header(new HeaderBuilder()
+                        .count(CONSTANT_Utf8, 1)
+                        .count(CONSTANT_BootstrapMethod, 1))
+                .band(DELTA5, 0)               // cp_BootstrapMethod_ref
+                .band(UDELTA5, argc)           // cp_BootstrapMethod_arg_count
+                .band(DELTA5, new int[argc]);  // cp_BootstrapMethod_arg
+
+        IOException e = assertThrows(IOException.class, archive::unpack);
+        assertEquals("Too many arguments", e.getMessage());
+    }
 }

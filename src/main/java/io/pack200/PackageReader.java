@@ -645,8 +645,11 @@ class PackageReader extends BandStructure {
                 cp_BootstrapMethod_arg.readFrom(in);
                 cp_BootstrapMethod_arg.setIndex(getCPIndex(CONSTANT_LoadableValue));
                 for (int i = 0; i < cpMap.length; i++) {
-                    MethodHandleEntry bsm = (MethodHandleEntry) cp_BootstrapMethod_ref.getRef();
                     int argc = cp_BootstrapMethod_arg_count.getInt();
+                    if (Integer.toUnsignedLong(argc) > 0xFFFF - 1) { // the method handle and the arguments use at most 65535 references
+                        throw new IOException("Too many arguments");
+                    }
+                    MethodHandleEntry bsm = (MethodHandleEntry) cp_BootstrapMethod_ref.getRef();
                     Entry[] argRefs = new Entry[argc];
                     for (int j = 0; j < argc; j++) {
                         argRefs[j] = cp_BootstrapMethod_arg.getRef();
