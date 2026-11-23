@@ -51,6 +51,7 @@ static jmethodID currentInstMID;
 static jmethodID readInputMID;
 static jclass    NIclazz;
 static jmethodID getUnpackerPtrMID;
+static JavaVM*   javaVM;  // set by initIDs, avoids linking with libjvm for JNI_GetCreatedJavaVMs
 
 static char* dbg = null;
 
@@ -121,11 +122,8 @@ static unpacker* get_unpacker(JNIEnv *env, jobject pObj, bool noCreate=false) {
 // This is the harder trick:  Pull the current state out of mid-air.
 static unpacker* get_unpacker() {
   //fprintf(stderr, "get_unpacker()\n");
-  JavaVM* vm = null;
-  jsize nVM = 0;
-  jint retval = JNI_GetCreatedJavaVMs(&vm, 1, &nVM);
-  // other VM implements may differ, thus for correctness, we need these checks
-  if (retval != JNI_OK || nVM != 1)
+  JavaVM* vm = javaVM;
+  if (vm == null)
     return null;
   void* envRaw = null;
   vm->GetEnv(&envRaw, JNI_VERSION_1_1);
@@ -178,6 +176,11 @@ Java_io_pack200_NativeUnpack_initIDs(JNIEnv *env, jclass clazz) {
   while( dbg != null) { sleep(10); }
 #endif
   NIclazz = (jclass) env->NewGlobalRef(clazz);
+
+  if (env->GetJavaVM(&javaVM) != JNI_OK) {
+    THROW_IOE(ERROR_INIT);
+    return;
+  }
 
   unpackerPtrFID = env->GetFieldID(clazz, "unpackerPtr", "J");
   CHECK_EXCEPTION_RETURN_VOID_THROW_IOE(unpackerPtrFID, ERROR_INIT);
