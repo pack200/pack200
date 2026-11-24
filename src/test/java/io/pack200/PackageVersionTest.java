@@ -38,12 +38,15 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.nio.file.Files;
 import java.util.jar.JarFile;
 import io.pack200.Pack200;
 import io.pack200.Pack200.Packer;
 import io.pack200.Pack200.Unpacker;
 import org.junit.After;
 import org.junit.Test;
+import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.Opcodes;
 
 import static org.junit.Assert.*;
 
@@ -70,7 +73,7 @@ public class PackageVersionTest {
     @Test
     public void testNoClassFiles() throws Exception {
         // test for resource file, ie. no class files
-        createClassFile("Test6");
+        createJavaFile("Test6");
         verifyPack("target/Test6.java", JAVA5_PACKAGE_MAJOR_VERSION,
                 JAVA5_PACKAGE_MINOR_VERSION);
     }
@@ -89,18 +92,14 @@ public class PackageVersionTest {
         }
     }
 
-    private void createClassFile(String name) {
-        createJavaFile(name);
-        String target = name.substring(name.length() - 1);
-        String javacCmds[] = {
-            "-source",
-            "7",
-            "-target",
-            "7",
-            "-Xlint:-options",
-            "target/" + name + ".java"
-        };
-        TestUtils.compiler(javacCmds);
+    /**
+     * Generates an empty class with the class file version 51 (Java 7), which javac no longer targets.
+     */
+    private void createClassFile(String name) throws IOException {
+        ClassWriter cw = new ClassWriter(0);
+        cw.visit(Opcodes.V1_7, Opcodes.ACC_PUBLIC | Opcodes.ACC_SUPER, name, null, "java/lang/Object", null);
+        cw.visitEnd();
+        Files.write(new File("target", name + ".class").toPath(), cw.toByteArray());
     }
 
     private void createJavaFile(String name) {
