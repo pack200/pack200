@@ -1,7 +1,7 @@
 Pack200 - Optimized compression for JAR files
 =============================================
 
-[![Build Status](https://secure.travis-ci.org/pack200/pack200.svg)](http://travis-ci.org/pack200/pack200)
+[![Build Status](https://github.com/pack200/pack200/actions/workflows/build.yml/badge.svg)](https://github.com/pack200/pack200/actions/workflows/build.yml)
 [![Coverage Status](https://coveralls.io/repos/github/pack200/pack200/badge.svg?branch=master)](https://coveralls.io/github/pack200/pack200?branch=master)
 [![License](https://img.shields.io/badge/license-GPL--2.0%20+%20Classpath%20Exception-blue.svg)](https://openjdk.java.net/legal/gplv2+ce.html)
 [![Maven Central](https://img.shields.io/maven-central/v/io.pack200/pack200.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22io.pack200%22)
