@@ -95,11 +95,6 @@ static char* dbg = null;
     } while (JNI_FALSE)
 #endif
 
-/*
- * Declare library specific JNI_Onload entry if static build
- */
-DEF_STATIC_JNI_OnLoad
-
 static jlong read_input_via_jni(unpacker* self,
                                 void* buf, jlong minlen, jlong maxlen);
 
