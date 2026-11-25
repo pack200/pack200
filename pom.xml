@@ -65,6 +65,11 @@
         <configuration>
           <source>8</source>
           <target>8</target>
+          <compilerArgs>
+            <!-- JNI header for the native unpacker -->
+            <arg>-h</arg>
+            <arg>${project.build.directory}/native/include</arg>
+          </compilerArgs>
         </configuration>
       </plugin>
       <plugin>
