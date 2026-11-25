@@ -30,12 +30,15 @@ package io.pack200;
  * @summary Verify Pack200 initialization with security manager
  */
 
+import org.junit.Assume;
 import org.junit.Test;
 
 public class SecurityTest {
 
     @Test
     public void testInitialization() {
+        Assume.assumeTrue(Double.parseDouble(System.getProperty("java.specification.version")) < 18);
+
         System.setSecurityManager(new SecurityManager() {
             @Override
             public void checkPropertyAccess(String key) {
