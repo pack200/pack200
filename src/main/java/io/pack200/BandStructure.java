@@ -962,16 +962,19 @@ class BandStructure {
             return getValue();
         }
         /** Return the sum of all values in this band. */
-        public int getIntTotal() {
+        public int getIntTotal() throws IOException {
             assert(phase() == DISBURSE_PHASE);
             // assert that this is the whole pass; no other reads allowed
             assert(valuesRemainingForDebug() == length());
-            int total = 0;
+            long total = 0;
             for (int k = length(); k > 0; k--) {
-                total += getInt();
+                total += Integer.toUnsignedLong(getInt());
+                if (total > Integer.MAX_VALUE) {
+                    throw new IOException("Value total overflow in " + name());
+                }
             }
             resetForSecondPass();
-            return total;
+            return (int) total;
         }
         /** Return the occurrence count of a specific value in this band. */
         public int getIntCount(int value) {

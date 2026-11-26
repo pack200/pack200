@@ -142,4 +142,22 @@ public class MalformedArchiveTest {
         IOException e = assertThrows(IOException.class, archive::unpack);
         assertEquals("Too many arguments", e.getMessage());
     }
+
+    @Test
+    public void testClassInterfaceCountOverflow() throws Exception {
+        // the total of the counts overflows to 1, which matches the number of interfaces
+        Pack200Builder archive = new Pack200Builder()
+                .header(new HeaderBuilder()
+                        .count(CONSTANT_Utf8, 1)
+                        .count(CONSTANT_Class, 1)
+                        .classes(3))
+                .band(UDELTA5, 0)                                        // cp_Class
+                .band(DELTA5, 0, 0, 0)                                   // class_this
+                .band(DELTA5, 0, 0, 0)                                   // class_super
+                .band(DELTA5, Integer.MAX_VALUE, Integer.MAX_VALUE, 3)   // class_interface_count
+                .band(DELTA5, 0);                                        // class_interface
+
+        IOException e = assertThrows(IOException.class, archive::unpack);
+        assertEquals("Value total overflow in class_interface_count", e.getMessage());
+    }
 }
