@@ -2195,11 +2195,10 @@ class PackageReader extends BandStructure {
                         int size = bc_escrefsize.getInt();
                         Entry ref = bc_escref.getRef();
                         if (size == 1)  ldcRefSet.add(ref);
-                        int fmt;
                         switch (size) {
                         case 1: fixupBuf.addU1(pc, ref); break;
                         case 2: fixupBuf.addU2(pc, ref); break;
-                        default: assert(false); fmt = 0;
+                        default: throw new IOException("Bad escape reference size");
                         }
                         buf[pc+0] = buf[pc+1] = 0;
                         pc += size;

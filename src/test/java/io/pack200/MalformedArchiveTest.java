@@ -19,6 +19,7 @@
 
 package io.pack200;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 
@@ -159,5 +160,52 @@ public class MalformedArchiveTest {
 
         IOException e = assertThrows(IOException.class, archive::unpack);
         assertEquals("Value total overflow in class_interface_count", e.getMessage());
+    }
+
+    @Test
+    public void testBadEscapeReferenceSize() throws Exception {
+        Pack200Builder archive = classWithCode(_ref_escape, _return, _end_marker)
+                .band(UNSIGNED5, 0)    // bc_escref
+                .band(UNSIGNED5, 3);   // bc_escrefsize, only 1 and 2 are valid
+
+        IOException e = assertThrows(IOException.class, archive::unpack);
+        assertEquals("Bad escape reference size", e.getMessage());
+    }
+
+    /**
+     * Builds an archive containing the class A with the static method m(int), up to its bytecodes.
+     * The operand bands following the bytecodes are left to the caller.
+     */
+    private Pack200Builder classWithCode(int... bytecodes) throws IOException {
+        int[] chars = {
+                '(', 'I', ')', 'V',
+                'A',
+                'j', 'a', 'v', 'a', '/', 'l', 'a', 'n', 'g', '/', 'O', 'b', 'j', 'e', 'c', 't',
+                'm'};
+
+        return new Pack200Builder()
+                .header(new HeaderBuilder()
+                        .count(CONSTANT_Utf8, 5)
+                        .count(CONSTANT_Class, 2)
+                        .count(CONSTANT_Signature, 1)
+                        .count(CONSTANT_NameandType, 1)
+                        .classes(1))
+                .band(DELTA5, 0, 0, 0)            // cp_Utf8_prefix
+                .band(UNSIGNED5, 4, 1, 16, 1)     // cp_Utf8_suffix, the first string is empty
+                .band(CHAR3, chars)               // cp_Utf8_chars
+                .band(UDELTA5, 2, 3)              // cp_Class: A and java/lang/Object
+                .band(DELTA5, 1)                  // cp_Signature_form: (I)V
+                .band(DELTA5, 4)                  // cp_Descr_name: m
+                .band(UDELTA5, 0)                 // cp_Descr_type: (I)V
+                .band(DELTA5, 0)                  // class_this: A
+                .band(DELTA5, 1)                  // class_super: java/lang/Object
+                .band(DELTA5, 0)                  // class_interface_count
+                .band(DELTA5, 0)                  // class_field_count
+                .band(DELTA5, 1)                  // class_method_count
+                .band(MDELTA5, 0)                 // method_descr: m:(I)V
+                .band(UNSIGNED5, 0x08 | (1 << 17))  // method_flags_lo: ACC_STATIC, the bit 17 declares the Code attribute
+                .band(UNSIGNED5, 0x21)              // class_flags_lo: ACC_PUBLIC | ACC_SUPER
+                .band(BYTE1, 2)                   // code_headers, the short form of a code with 1 local and no handler
+                .band(BYTE1, bytecodes);          // bc_codes
     }
 }

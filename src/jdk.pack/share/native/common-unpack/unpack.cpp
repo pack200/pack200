@@ -4236,7 +4236,7 @@ void unpacker::write_bc_ops() {
         switch (size) {
         case 1: putu1ref(ref); break;
         case 2: putref(ref);   break;
-        default: assert(false);
+        default: abort("bad escape reference size"); break;
         }
         continue;
       }
