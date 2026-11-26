@@ -163,6 +163,16 @@ public class MalformedArchiveTest {
     }
 
     @Test
+    public void testTooManySwitchCases() throws Exception {
+        // the count is rejected before sizing the bands of the cases, whatever the size of the input
+        Pack200Builder archive = classWithCode(_iload_0, _lookupswitch, _return, _return, _end_marker)
+                .band(UNSIGNED5, 65535 / 4 + 1);   // bc_case_count
+
+        IOException e = assertThrows(IOException.class, archive::unpack);
+        assertEquals("Too many switch cases", e.getMessage());
+    }
+
+    @Test
     public void testBadEscapeReferenceSize() throws Exception {
         Pack200Builder archive = classWithCode(_ref_escape, _return, _end_marker)
                 .band(UNSIGNED5, 0)    // bc_escref

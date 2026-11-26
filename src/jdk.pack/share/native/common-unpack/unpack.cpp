@@ -3223,6 +3223,11 @@ void unpacker::read_bcs() {
   bc_case_count.readData((int)all_switch_ops.size());
   for (i = 0; i < (int)all_switch_ops.size(); i++) {
     int caseCount = bc_case_count.getInt();
+    // the code of a method is limited to 65535 bytes, and a case takes at least 4 bytes
+    if ((uint)caseCount > 65535 / 4) {
+      abort("too many switch cases");
+      return;
+    }
     int bc        = all_switch_ops.getByte(i);
     bc_label.expectMoreLength(1+caseCount); // default label + cases
     bc_case_value.expectMoreLength(bc == bc_tableswitch ? 1 : caseCount);

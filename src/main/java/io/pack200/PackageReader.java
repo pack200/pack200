@@ -2082,6 +2082,10 @@ class PackageReader extends BandStructure {
         for (Integer i : allSwitchOps) {
             int bc = i.intValue();
             int caseCount = bc_case_count.getInt();
+            // the code of a method is limited to 65535 bytes, and a case takes at least 4 bytes
+            if (Integer.toUnsignedLong(caseCount) > 65535 / 4) {
+                throw new IOException("Too many switch cases");
+            }
             bc_label.expectMoreLength(1+caseCount); // default label + cases
             bc_case_value.expectMoreLength(bc == _tableswitch ? 1 : caseCount);
         }
