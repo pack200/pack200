@@ -129,6 +129,18 @@ public class MalformedArchiveTest {
     }
 
     @Test
+    public void testConstantPoolReferenceOutOfRange() throws Exception {
+        Pack200Builder archive = new Pack200Builder()
+                .header(new HeaderBuilder()
+                        .count(CONSTANT_Utf8, 1)
+                        .count(CONSTANT_Class, 1))
+                .band(UDELTA5, 5);   // cp_Class, referencing the 6th Utf8 constant of a pool of 1
+
+        IOException e = assertThrows(IOException.class, archive::unpack);
+        assertEquals("Bad constant pool reference", e.getMessage());
+    }
+
+    @Test
     public void testTooManyBootstrapMethodArguments() throws Exception {
         int argc = 0xFFFF;
 

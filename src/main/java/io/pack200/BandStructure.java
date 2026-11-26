@@ -1038,16 +1038,16 @@ class BandStructure {
             putRef(e, getCPIndex(cptag));
         }
 
-        public Entry getRef() {
+        public Entry getRef() throws IOException {
             if (index == null)  Utils.log.warning("No index for "+this);
             assert(index != null);
             return decodeRefOrNull(getValue(), index);
         }
-        public Entry getRef(Index index) {
+        public Entry getRef(Index index) throws IOException {
             assert(this.index == null);
             return decodeRefOrNull(getValue(), index);
         }
-        public Entry getRef(byte cptag) {
+        public Entry getRef(byte cptag) throws IOException {
             return getRef(getCPIndex(cptag));
         }
 
@@ -1061,7 +1061,7 @@ class BandStructure {
             // If nulls are expected, increment, to make -1 code turn to 0.
             return (nullOK ? 1 : 0) + nonNullCode;
         }
-        private Entry decodeRefOrNull(int code, Index index) {
+        private Entry decodeRefOrNull(int code, Index index) throws IOException {
             // Inverse to encodeRefOrNull...
             int nonNullCode = code - (nullOK ? 1 : 0);
             if (nonNullCode == -1) {
@@ -1087,9 +1087,9 @@ class BandStructure {
         return coding;
     }
 
-    Entry decodeRef(int n, Index ix) {
+    Entry decodeRef(int n, Index ix) throws IOException {
         if (n < 0 || n >= ix.size())
-            Utils.log.warning("decoding bad ref "+n+" in "+ix);
+            throw new IOException("Bad constant pool reference");
         Entry e = ix.getEntry(n);
         if (verbose > 2)
             Utils.log.fine("getRef "+n+" => "+e);

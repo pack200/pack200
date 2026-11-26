@@ -36,6 +36,7 @@ import java.io.FilterInputStream;
 import java.io.BufferedInputStream;
 import java.io.InputStream;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Arrays;
@@ -1810,18 +1811,27 @@ class PackageReader extends BandStructure {
                 final Band[] ab = attrBandTable.get(def);
                 // Read one attribute of type def from ab into a byte array.
                 buf.reset();
-                Object fixups = a.unparse(new Attribute.ValueStream() {
-                    public int getInt(int bandIndex) {
-                        return ((IntBand) ab[bandIndex]).getInt();
-                    }
-                    public Entry getRef(int bandIndex) {
-                        return ((CPRefBand) ab[bandIndex]).getRef();
-                    }
-                    public int decodeBCI(int bciCode) {
-                        Code code = (Code) h;
-                        return code.decodeBCI(bciCode);
-                    }
-                }, buf);
+                Object fixups;
+                try {
+                    fixups = a.unparse(new Attribute.ValueStream() {
+                        public int getInt(int bandIndex) {
+                            return ((IntBand) ab[bandIndex]).getInt();
+                        }
+                        public Entry getRef(int bandIndex) {
+                            try {
+                                return ((CPRefBand) ab[bandIndex]).getRef();
+                            } catch (IOException e) {
+                                throw new UncheckedIOException(e);
+                            }
+                        }
+                        public int decodeBCI(int bciCode) {
+                            Code code = (Code) h;
+                            return code.decodeBCI(bciCode);
+                        }
+                    }, buf);
+                } catch (UncheckedIOException e) {
+                    throw e.getCause();
+                }
                 // Replace the canonical attr with the one just read.
                 j.set(a.addContent(buf.toByteArray(), fixups));
                 if (isCV)  setConstantValueIndex(null);  // clean up
