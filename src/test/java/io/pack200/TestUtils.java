@@ -102,6 +102,7 @@ public class TestUtils {
     static void doCompareVerify(File reference, File specimen) throws IOException {
         List<String> cmds = new ArrayList<String>();
         cmds.add(getJavaCmd());
+        cmds.add("-Xmx256m");
         cmds.add("-cp");
         cmds.add(System.getProperty("java.class.path")); // the verifier needs ASM
         cmds.add("sun.tools.pack.verify.Main");
@@ -115,6 +116,7 @@ public class TestUtils {
             throws IOException {
         List<String> cmds = new ArrayList<String>();
         cmds.add(getJavaCmd());
+        cmds.add("-Xmx256m");
         cmds.add("-cp");
         cmds.add(System.getProperty("java.class.path")); // the verifier needs ASM
         cmds.add("sun.tools.pack.verify.Main");
