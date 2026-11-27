@@ -131,6 +131,7 @@
           <archive>
             <manifestEntries>
               <Main-Class>io.pack200.Driver</Main-Class>
+              <Enable-Native-Access>ALL-UNNAMED</Enable-Native-Access>
             </manifestEntries>
           </archive>
         </configuration>
