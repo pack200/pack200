@@ -34,7 +34,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.text.MessageFormat;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -45,7 +44,6 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Properties;
-import java.util.ResourceBundle;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.jar.JarFile;
@@ -57,8 +55,72 @@ import java.util.zip.GZIPOutputStream;
  */
 
 class Driver {
-    private static final ResourceBundle RESOURCE =
-        ResourceBundle.getBundle("io.pack200.DriverResource");
+
+    private static final String[] PACK_HELP = {
+        "Usage:  pack200 [-opt... | --option=value]... x.pack[.gz] y.jar",
+        "",
+        "Packing Options",
+        "  -r, --repack                    repack or normalize a jar, suitable for ",
+        "                                  signing with jarsigner",
+        "  -g, --no-gzip                   output a plain pack file, suitable to be",
+        "                                  compressed with a file compression utility",
+        "  --gzip                          (default) post compress the pack output",
+        "                                  with gzip",
+        "  -G, --strip-debug               remove debugging attributes (SourceFile,",
+        "                                  LineNumberTable, LocalVariableTable",
+        "                                  and LocalVariableTypeTable) while packing",
+        "  -O, --no-keep-file-order        do not transmit file ordering information",
+        "  --keep-file-order               (default) preserve input file ordering",
+        "  -S{N}, --segment-limit={N}      limit segment sizes (default unlimited)",
+        "  -E{N}, --effort={N}             packing effort (default N=5)",
+        "  -H{h}, --deflate-hint={h}       transmit deflate hint: true, false,",
+        "                                  or keep (default)",
+        "  -m{V}, --modification-time={V}  transmit modtimes: latest or keep (default)",
+        "  -P{F}, --pass-file={F}          transmit the given input element(s) unchanged",
+        "  -U{a}, --unknown-attribute={a}  unknown attribute action: error, strip,",
+        "                                  or pass (default)",
+        "  -C{N}={L}, --class-attribute={N}={L}  (user-defined attribute)",
+        "  -F{N}={L}, --field-attribute={N}={L}  (user-defined attribute)",
+        "  -M{N}={L}, --method-attribute={N}={L} (user-defined attribute)",
+        "  -D{N}={L}, --code-attribute={N}={L}   (user-defined attribute)",
+        "  -f{F}, --config-file={F}        read file F for Pack200.Packer properties",
+        "  -v, --verbose                   increase program verbosity",
+        "  -q, --quiet                     set verbosity to lowest level",
+        "  -l{F}, --log-file={F}           output to the given log file, ",
+        "                                  or '-' for System.out",
+        "  -?, -h, --help                  print this help message",
+        "  -V, --version                   print program version",
+        "  -J{X}                           pass option X to underlying Java VM",
+        "",
+        "Notes:",
+        "  The -P, -C, -F, -M, and -D options accumulate.",
+        "  Example attribute definition:  -C SourceFile=RUH .",
+        "  Config. file properties are defined by the Pack200 API.",
+        "  For meaning of -S, -E, -H-, -m, -U values, see Pack200 API.",
+        "  Layout definitions (like RUH) are defined by JSR 200.",
+        "",
+        "Repacking mode updates the JAR file with a pack/unpack cycle:",
+        "    pack200 [-r|--repack] [-opt | --option=value]... [repackedy.jar] y.jar\n",
+        "",
+        "Exit Status:",
+        "  0 if successful, >0 if an error occurred"
+    };
+
+    private static final String[] UNPACK_HELP = {
+        "Usage:  unpack200 [-opt... | --option=value]... x.pack[.gz] y.jar\n",
+        "",
+        "Unpacking Options",
+        "  -H{h}, --deflate-hint={h}     override transmitted deflate hint:",
+        "                                true, false, or keep (default)",
+        "  -r, --remove-pack-file        remove input file after unpacking",
+        "  -v, --verbose                 increase program verbosity",
+        "  -q, --quiet                   set verbosity to lowest level",
+        "  -l{F}, --log-file={F}         output to the given log file, or",
+        "                                '-' for System.out",
+        "  -?, -h, --help                print this help message",
+        "  -V, --version                 print program version",
+        "  -J{X}                         pass option X to underlying Java VM"
+    };
 
     public static void main(String[] ava) throws IOException {
         List<String> av = new ArrayList<>(Arrays.asList(ava));
@@ -162,8 +224,7 @@ class Driver {
                         engProps.put((String) me.getKey(), (String) me.getValue());
                     }
                 } else if ("--version".equals(state)) {
-                        System.out.println(MessageFormat.format(RESOURCE.getString(DriverResource.VERSION),
-                                                                Driver.class.getName(), "1.31, 07/05/05"));
+                    System.out.println(Driver.class.getName() + " version 1.31, 07/05/05");
                     return;
                 } else if ("--help".equals(state)) {
                     printUsage(doPack, true, System.out);
@@ -174,7 +235,7 @@ class Driver {
                 }
             }
         } catch (IllegalArgumentException ee) {
-                System.err.println(MessageFormat.format(RESOURCE.getString(DriverResource.BAD_ARGUMENT), ee));
+            System.err.println("Bad argument: " + ee);
             printUsage(doPack, false, System.err);
             System.exit(2);
             return;
@@ -194,9 +255,7 @@ class Driver {
                     logFile = val;
                     break;
                 default:
-                    throw new InternalError(MessageFormat.format(
-                            RESOURCE.getString(DriverResource.BAD_OPTION),
-                            opt, avProps.get(opt)));
+                    throw new InternalError("Bad option: " + opt + "=" + avProps.get(opt));
             }
         }
 
@@ -230,9 +289,7 @@ class Driver {
             if (packfile.toLowerCase().endsWith(".pack") ||
                 packfile.toLowerCase().endsWith(".pac") ||
                 packfile.toLowerCase().endsWith(".gz")) {
-                System.err.println(MessageFormat.format(
-                        RESOURCE.getString(DriverResource.BAD_REPACK_OUTPUT),
-                        packfile));
+                System.err.println("Bad --repack output: " + packfile);
                 printUsage(doPack, false, System.err);
                 System.exit(2);
             }
@@ -272,9 +329,9 @@ class Driver {
         if (doRepack && newfile.equals(jarfile)) {
             String zipc = getZipComment(jarfile);
             if (verbose && !zipc.isEmpty())
-                System.out.println(MessageFormat.format(RESOURCE.getString(DriverResource.DETECTED_ZIP_COMMENT), zipc));
+                System.out.println("Detected ZIP comment: " + zipc);
             if (zipc.indexOf(Utils.PACK_ZIP_ARCHIVE_MARKER_COMMENT) >= 0) {
-                    System.out.println(MessageFormat.format(RESOURCE.getString(DriverResource.SKIP_FOR_REPACKED), jarfile));
+                    System.out.println("Skipping because already repacked: " + jarfile);
                         doPack = false;
                         doUnpack = false;
                         doRepack = false;
@@ -294,7 +351,7 @@ class Driver {
                     System.setOut(System.err);
                 } else if (doZip) {
                     if (!packfile.endsWith(".gz")) {
-                    System.err.println(MessageFormat.format(RESOURCE.getString(DriverResource.WRITE_PACK_FILE), packfile));
+                    System.err.println("To write a *.pack file, specify --no-gzip: " + packfile);
                         printUsage(doPack, false, System.err);
                         System.exit(2);
                     }
@@ -304,7 +361,7 @@ class Driver {
                 } else {
                     if (!packfile.toLowerCase().endsWith(".pack") &&
                             !packfile.toLowerCase().endsWith(".pac")) {
-                        System.err.println(MessageFormat.format(RESOURCE.getString(DriverResource.WRITE_PACKGZ_FILE),packfile));
+                        System.err.println("To write a *.pack.gz file, specify --gzip: " + packfile);
                         printUsage(doPack, false, System.err);
                         System.exit(2);
                     }
@@ -325,7 +382,7 @@ class Driver {
                 bakf.delete();
                 boolean okBackup = new File(jarfile).renameTo(bakf);
                 if (!okBackup) {
-                        throw new Error(MessageFormat.format(RESOURCE.getString(DriverResource.SKIP_FOR_MOVE_FAILED),bakfile));
+                    throw new Error("Skipping unpack because move failed: " + bakfile);
                 } else {
                     // Open jarfile recovery bracket.
                     bakfile = bakf.getPath();
@@ -397,13 +454,11 @@ class Driver {
     private static
     void printUsage(boolean doPack, boolean full, PrintStream out) {
         String prog = doPack ? "pack200" : "unpack200";
-        String[] packUsage = (String[])RESOURCE.getObject(DriverResource.PACK_HELP);
-        String[] unpackUsage = (String[])RESOURCE.getObject(DriverResource.UNPACK_HELP);
-        String[] usage = doPack? packUsage: unpackUsage;
+        String[] usage = doPack ? PACK_HELP : UNPACK_HELP;
         for (int i = 0; i < usage.length; i++) {
             out.println(usage[i]);
             if (!full) {
-            out.println(MessageFormat.format(RESOURCE.getString(DriverResource.MORE_INFO), prog));
+            out.println("(For more information, run " + prog + " --help .)");
                 break;
             }
         }
@@ -540,7 +595,7 @@ class Driver {
             if (opt.length() == 0)    continue loadOptmap;
             String[] prevWords = optmap.put(opt, words);
             if (prevWords != null)
-            throw new RuntimeException(MessageFormat.format(RESOURCE.getString(DriverResource.DUPLICATE_OPTION), optline.trim()));
+                throw new RuntimeException("duplicate option: " + optline.trim());
         }
 
         // State machine for parsing a command line.
@@ -686,7 +741,7 @@ class Driver {
                         didAction = true;
                         break;
                     default:
-                        throw new RuntimeException(MessageFormat.format(RESOURCE.getString(DriverResource.BAD_SPEC),opt, spec));
+                        throw new RuntimeException("bad spec for " + opt + ": " + spec);
                     }
                 }
 
