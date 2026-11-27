@@ -92,7 +92,7 @@ class ClassReader {
     }
 
     private void skip(int n, String what) throws IOException {
-        Utils.log.warning("skipping "+n+" bytes of "+what);
+        Pack200Logger.log.warning("skipping "+n+" bytes of "+what);
         long skipped = 0;
         while (skipped < n) {
             long j = in.skip(n - skipped);
@@ -190,7 +190,7 @@ class ClassReader {
             ok = true;
         } finally {
             if (!ok) {
-                if (verbose > 0) Utils.log.warning("Erroneous data at input offset "+inPos+" of "+cls.file);
+                if (verbose > 0) Pack200Logger.log.warning("Erroneous data at input offset "+inPos+" of "+cls.file);
             }
         }
     }
@@ -335,7 +335,7 @@ class ClassReader {
         // Fix up refs, which might be out of order.
         while (fptr > 0) {
             if (verbose > 3)
-                Utils.log.fine("CP fixups ["+fptr/4+"]");
+                Pack200Logger.log.fine("CP fixups ["+fptr/4+"]");
             int flimit = fptr;
             fptr = 0;
             for (int fi = 0; fi < flimit; ) {
@@ -344,7 +344,7 @@ class ClassReader {
                 int ref = fixups[fi++];
                 int ref2 = fixups[fi++];
                 if (verbose > 3)
-                    Utils.log.fine("  cp["+cpi+"] = "+ConstantPool.tagName(tag)+"{"+ref+","+ref2+"}");
+                    Pack200Logger.log.fine("  cp["+cpi+"] = "+ConstantPool.tagName(tag)+"{"+ref+","+ref2+"}");
                 if (ref >= 0 && checkValid(cpMap[ref]) == null || ref2 >= 0 && checkValid(cpMap[ref2]) == null) {
                     // Defer.
                     fixups[fptr++] = cpi;
@@ -473,7 +473,7 @@ class ClassReader {
         int na = readUnsignedShort();
         if (na == 0)  return;  // nothing to do here
         if (verbose > 3)
-            Utils.log.fine("readAttributes "+h+" ["+na+"]");
+            Pack200Logger.log.fine("readAttributes "+h+" ["+na+"]");
         for (int i = 0; i < na; i++) {
             String name = readUtf8Ref().stringValue();
             int length = readInt();
@@ -498,16 +498,16 @@ class ClassReader {
             // Find canonical instance of the requested attribute.
             Attribute a = Attribute.lookup(Package.attrDefs, ctype, name);
             if (verbose > 4 && a != null)
-                Utils.log.fine("pkg_attribute_lookup "+name+" = "+a);
+                Pack200Logger.log.fine("pkg_attribute_lookup "+name+" = "+a);
             if (a == null) {
                 a = Attribute.lookup(this.attrDefs, ctype, name);
                 if (verbose > 4 && a != null)
-                    Utils.log.fine("this "+name+" = "+a);
+                    Pack200Logger.log.fine("this "+name+" = "+a);
             }
             if (a == null) {
                 a = Attribute.lookup(null, ctype, name);
                 if (verbose > 4 && a != null)
-                    Utils.log.fine("null_attribute_lookup "+name+" = "+a);
+                    Pack200Logger.log.fine("null_attribute_lookup "+name+" = "+a);
             }
             if (a == null && length == 0) {
                 // Any zero-length attr is "known"...
@@ -583,7 +583,7 @@ class ClassReader {
             }
             h.addAttribute(a);
             if (verbose > 2)
-                Utils.log.fine("read "+a);
+                Pack200Logger.log.fine("read "+a);
         }
     }
 

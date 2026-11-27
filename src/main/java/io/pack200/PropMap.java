@@ -223,7 +223,7 @@ final class PropMap implements SortedMap<String, String>  {
         final long recentSecondCount = 1000000000;
 
         if (lval < recentSecondCount*10 && !"0".equals(sval))
-            Utils.log.warning("Supplied modtime appears to be seconds rather than milliseconds: "+sval);
+            Pack200Logger.log.warning("Supplied modtime appears to be seconds rather than milliseconds: "+sval);
 
         return (int)((lval+500)/1000);
     }

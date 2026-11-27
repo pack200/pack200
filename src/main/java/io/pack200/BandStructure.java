@@ -372,7 +372,7 @@ class BandStructure {
             this.regularCoding = regularCoding;
             this.seqForDebug = ++nextSeqForDebug;
             if (verbose > 2)
-                Utils.log.fine("Band "+seqForDebug+" is "+name);
+                Pack200Logger.log.fine("Band "+seqForDebug+" is "+name);
             // caller must call init
         }
 
@@ -469,7 +469,7 @@ class BandStructure {
         }
         protected abstract void readDataFrom(InputStream in) throws IOException;
         protected void readyToDisburse() {
-            if (verbose > 1)  Utils.log.fine("readyToDisburse "+this);
+            if (verbose > 1)  Pack200Logger.log.fine("readyToDisburse "+this);
             setPhase(DISBURSE_PHASE);
         }
         public void doneDisbursing() {
@@ -597,7 +597,7 @@ class BandStructure {
                 } else {
                     assert(canVary);
                     if (verbose > 1)
-                        Utils.log.fine("regular coding fails in band "+name());
+                        Pack200Logger.log.fine("regular coding fails in band "+name());
                     bandCoding = UNSIGNED5;
                 }
                 outputSize = -1;
@@ -615,7 +615,7 @@ class BandStructure {
             if (bandCoding != regularCoding) {
                 metaCoding = bandCoding.getMetaCoding(regularCoding);
                 if (verbose > 1) {
-                    Utils.log.fine("alternate coding "+this+" "+bandCoding);
+                    Pack200Logger.log.fine("alternate coding "+this+" "+bandCoding);
                 }
             } else if (canVary &&
                        decodeEscapeValue(values[0], regularCoding) >= 0) {
@@ -632,7 +632,7 @@ class BandStructure {
                     if (i == 1)  sb.append(" /");
                     sb.append(" ").append(metaCoding[i] & 0xFF);
                 }
-                Utils.log.fine("   meta-coding "+sb);
+                Pack200Logger.log.fine("   meta-coding "+sb);
             }
 
             assert((outputSize < 0) ||
@@ -704,7 +704,7 @@ class BandStructure {
             length = valuesExpected();
             if (length == 0)  return;  // nothing to read
             if (verbose > 1)
-                Utils.log.fine("Reading band "+this);
+                Pack200Logger.log.fine("Reading band "+this);
             if (!canVaryCoding()) {
                 bandCoding = regularCoding;
                 metaCoding = noMetaCoding;
@@ -723,7 +723,7 @@ class BandStructure {
                     metaCoding = defaultMetaCoding;
                 } else {
                     if (verbose > 2)
-                        Utils.log.fine("found X="+X+" => XB="+XB);
+                        Pack200Logger.log.fine("found X="+X+" => XB="+XB);
                     bandCoding = getBandHeader(XB, regularCoding);
                     // This is really used only by dumpBands.
                     int p0 = bandHeaderBytePos0;
@@ -735,7 +735,7 @@ class BandStructure {
             }
             if (bandCoding != regularCoding) {
                 if (verbose > 1)
-                    Utils.log.fine(name()+": irregular coding "+bandCoding);
+                    Pack200Logger.log.fine(name()+": irregular coding "+bandCoding);
             }
             bandCoding.readArrayFrom(in, values, 0, length);
             if (optDumpBands)  dumpBand();
@@ -859,7 +859,7 @@ class BandStructure {
             if (vex == 0)  return;
             if (verbose > 1) {
                 lengthForDebug = vex;
-                Utils.log.fine("Reading band "+this);
+                Pack200Logger.log.fine("Reading band "+this);
                 lengthForDebug = -1;
             }
             byte[] buf = new byte[Math.min(vex, 1<<14)];
@@ -1039,7 +1039,7 @@ class BandStructure {
         }
 
         public Entry getRef() throws IOException {
-            if (index == null)  Utils.log.warning("No index for "+this);
+            if (index == null)  Pack200Logger.log.warning("No index for "+this);
             assert(index != null);
             return decodeRefOrNull(getValue(), index);
         }
@@ -1083,7 +1083,7 @@ class BandStructure {
             throw new RuntimeException("null index for " + e.stringValue());
         int coding = ix.indexOf(e);
         if (verbose > 2)
-            Utils.log.fine("putRef "+coding+" => "+e);
+            Pack200Logger.log.fine("putRef "+coding+" => "+e);
         return coding;
     }
 
@@ -1092,7 +1092,7 @@ class BandStructure {
             throw new IOException("Bad constant pool reference");
         Entry e = ix.getEntry(n);
         if (verbose > 2)
-            Utils.log.fine("getRef "+n+" => "+e);
+            Pack200Logger.log.fine("getRef "+n+" => "+e);
         return e;
     }
 
@@ -1123,7 +1123,7 @@ class BandStructure {
         }
         CodingChooser cc = getCodingChooser();
         if (verbose > 1 || cc.verbose > 1) {
-            Utils.log.fine("--- chooseCoding "+bandName);
+            Pack200Logger.log.fine("--- chooseCoding "+bandName);
         }
         return cc.choose(values, start, end, regular, sizes);
     }
@@ -1333,7 +1333,7 @@ class BandStructure {
                     long len = postCount - preCount;
                     preCount = postCount;
                     if ((verbose > 0 && len > 0) || verbose > 1) {
-                        Utils.log.info("  ...wrote "+len+" bytes from "+b);
+                        Pack200Logger.log.info("  ...wrote "+len+" bytes from "+b);
                     }
                 }
             }
@@ -1346,7 +1346,7 @@ class BandStructure {
                 Band b = bands[i];
                 b.readFrom(in);
                 if ((verbose > 0 && b.length() > 0) || verbose > 1) {
-                    Utils.log.info("  ...read "+b);
+                    Pack200Logger.log.info("  ...read "+b);
                 }
             }
         }
@@ -1397,7 +1397,7 @@ class BandStructure {
         all_bands.writeTo(out);
         if (verbose > 0) {
             long nbytes = outputCounter.getCount();
-            Utils.log.info("Wrote total of "+nbytes+" bytes.");
+            Pack200Logger.log.info("Wrote total of "+nbytes+" bytes.");
             assert(nbytes == archiveSize0+archiveSize1);
         }
         outputCounter = null;
@@ -1707,7 +1707,7 @@ class BandStructure {
             byte tag = f.getLiteralTag();
             ix = getCPIndex(tag);
             if (verbose > 2)
-                Utils.log.fine("setConstantValueIndex "+f+" "+ConstantPool.tagName(tag)+" => "+ix);
+                Pack200Logger.log.fine("setConstantValueIndex "+f+" "+ConstantPool.tagName(tag)+" => "+ix);
             assert(ix != null);
         }
         // Typically, allKQBands is the singleton of field_ConstantValue_KQ.
@@ -1941,7 +1941,7 @@ class BandStructure {
 
     private void adjustToClassVersion() throws IOException {
         if (getHighestClassVersion().lessThan(JAVA6_MAX_CLASS_VERSION)) {
-            if (verbose > 0)  Utils.log.fine("Legacy package version");
+            if (verbose > 0)  Pack200Logger.log.fine("Legacy package version");
             // Revoke definition of pre-1.6 attribute type.
             undefineAttribute(CODE_ATTR_StackMapTable, ATTR_CONTEXT_CODE);
         }
@@ -2174,7 +2174,7 @@ class BandStructure {
                 int base = xxx_attr_bands.size();
                 String pfx = cname+"_"+def.name()+"_";  // debug only
                 if (verbose > 1)
-                    Utils.log.fine("Making new bands for "+def);
+                    Pack200Logger.log.fine("Making new bands for "+def);
                 Band[] newAB  = makeNewAttributeBands(pfx, def,
                                                       xxx_attr_bands);
                 assert(newAB.length == def.bandCount);
@@ -2270,7 +2270,7 @@ class BandStructure {
             default: assert(false); continue;
             }
             if (verbose > 1) {
-                Utils.log.fine("New attribute band "+nb);
+                Pack200Logger.log.fine("New attribute band "+nb);
             }
         }
     }
@@ -2294,7 +2294,7 @@ class BandStructure {
             index = defList.size();
             defList.add(def);
             if (verbose > 0)
-                Utils.log.info("Adding new attribute at "+def +": "+index);
+                Pack200Logger.log.info("Adding new attribute at "+def +": "+index);
             attrIndexTable.put(def, index);
             return index;
         }
@@ -2308,7 +2308,7 @@ class BandStructure {
         // Adding a new fixed attribute.
         assert(0 <= index && index < attrIndexLimit[ctype]);
         if (verbose > (attrClassFileVersionMask == 0? 2:0))
-            Utils.log.fine("Fixing new attribute at "+index
+            Pack200Logger.log.fine("Fixing new attribute at "+index
                                +": "+def
                                +(defList.get(index) == null? "":
                                  "; replacing "+defList.get(index)));
@@ -2455,7 +2455,7 @@ class BandStructure {
             dumpDir = File.createTempFile("BD_", "", new File("."));
             dumpDir.delete();
             if (dumpDir.mkdir())
-                Utils.log.info("Dumping bands to "+dumpDir);
+                Pack200Logger.log.info("Dumping bands to "+dumpDir);
         }
         name = name.replace('(', ' ').replace(')', ' ');
         name = name.replace('/', ' ');
@@ -2463,7 +2463,7 @@ class BandStructure {
         name = name.trim().replace(' ','_');
         name = ((10000+seq) + "_" + name).substring(1);
         File dumpFile = new File(dumpDir, name+ext);
-        Utils.log.info("Dumping "+b+" to "+dumpFile);
+        Pack200Logger.log.info("Dumping "+b+" to "+dumpFile);
         return new BufferedOutputStream(new FileOutputStream(dumpFile));
     }
 
@@ -2480,7 +2480,7 @@ class BandStructure {
     // DEBUG ONLY:  Validate a phase.
     static boolean assertPhase(Band b, int phaseExpected) {
         if (b.phase() != phaseExpected) {
-            Utils.log.warning("phase expected "+phaseExpected+" was "+b.phase()+" in "+b);
+            Pack200Logger.log.warning("phase expected "+phaseExpected+" was "+b.phase()+" in "+b);
             return false;
         }
         return true;
@@ -2535,20 +2535,20 @@ class BandStructure {
             return true;
         }
         if (p0 == p1)
-            Utils.log.warning("Already in phase "+p0);
+            Pack200Logger.log.warning("Already in phase "+p0);
         else
-            Utils.log.warning("Unexpected phase "+p0+" -> "+p1);
+            Pack200Logger.log.warning("Unexpected phase "+p0+" -> "+p1);
         return false;
     }
 
     private static boolean assertDoneDisbursing(Band b) {
         if (b.phase != DISBURSE_PHASE) {
-            Utils.log.warning("assertDoneDisbursing: still in phase "+b.phase+": "+b);
+            Pack200Logger.log.warning("assertDoneDisbursing: still in phase "+b.phase+": "+b);
             if (verbose() <= 1)  return false;  // fail now
         }
         int left = b.valuesRemainingForDebug();
         if (left > 0) {
-            Utils.log.warning("assertDoneDisbursing: "+left+" values left in "+b);
+            Pack200Logger.log.warning("assertDoneDisbursing: "+left+" values left in "+b);
             if (verbose() <= 1)  return false;  // fail now
         }
         if (b instanceof MultiBand) {
@@ -2556,7 +2556,7 @@ class BandStructure {
             for (int i = 0; i < mb.bandCount; i++) {
                 Band sub = mb.bands[i];
                 if (sub.phase != DONE_PHASE) {
-                    Utils.log.warning("assertDoneDisbursing: sub-band still in phase "+sub.phase+": "+sub);
+                    Pack200Logger.log.warning("assertDoneDisbursing: sub-band still in phase "+sub.phase+": "+sub);
                     if (verbose() <= 1)  return false;  // fail now
                 }
             }
@@ -2607,9 +2607,9 @@ class BandStructure {
         Band p = prevForAssertMap.get(b);
         // Any previous band must be done reading before this one starts.
         if (p != null && phaseCmp(p.phase(), DISBURSE_PHASE) < 0) {
-            Utils.log.warning("Previous band not done reading.");
-            Utils.log.info("    Previous band: "+p);
-            Utils.log.info("        Next band: "+b);
+            Pack200Logger.log.warning("Previous band not done reading.");
+            Pack200Logger.log.info("    Previous band: "+p);
+            Pack200Logger.log.info("        Next band: "+b);
             assert(verbose > 0);  // die unless verbose is true
         }
         String name = b.name;
@@ -2619,10 +2619,10 @@ class BandStructure {
             String inName = bandSequenceList.removeFirst();
             // System.out.println("Reading: " + name);
             if (!inName.equals(name)) {
-                Utils.log.warning("Expected " + name + " but read: " + inName);
+                Pack200Logger.log.warning("Expected " + name + " but read: " + inName);
                 return false;
             }
-            Utils.log.info("Read band in sequence: " + name);
+            Pack200Logger.log.info("Read band in sequence: " + name);
         }
         return true;
     }
@@ -2634,7 +2634,7 @@ class BandStructure {
         for (int i = 0; i < b.length(); i++) {
             int v = b.valueAtForDebug(i);
             if (v < 0 || v >= limit) {
-                Utils.log.warning("CP ref out of range "+
+                Pack200Logger.log.warning("CP ref out of range "+
                                    "["+i+"] = "+v+" in "+b);
                 return false;
             }
@@ -2652,9 +2652,9 @@ class BandStructure {
         Band p = prevForAssertMap.get(b);
         // Any previous band must be done writing before this one starts.
         if (p != null && phaseCmp(p.phase(), DONE_PHASE) < 0) {
-            Utils.log.warning("Previous band not done writing.");
-            Utils.log.info("    Previous band: "+p);
-            Utils.log.info("        Next band: "+b);
+            Pack200Logger.log.warning("Previous band not done writing.");
+            Pack200Logger.log.info("    Previous band: "+p);
+            Pack200Logger.log.info("        Next band: "+b);
             assert(verbose > 0);  // die unless verbose is true
         }
         String name = b.name;

@@ -826,9 +826,9 @@ class Attribute implements Comparable<Attribute> {
         }
         String result = buf.toString();
         if (false && !result.equals(layout)) {
-            Utils.log.info("Normalizing layout string");
-            Utils.log.info("    From: "+layout);
-            Utils.log.info("    To:   "+result);
+            Pack200Logger.log.info("Normalizing layout string");
+            Pack200Logger.log.info("    From: "+layout);
+            Pack200Logger.log.info("    To:   "+result);
         }
         return result;
     }

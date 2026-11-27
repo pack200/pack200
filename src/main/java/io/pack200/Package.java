@@ -271,7 +271,7 @@ class Package {
             }
             if (a != olda) {
                 if (verbose > 2)
-                    Utils.log.fine("recoding obvious SourceFile="+obvious);
+                    Pack200Logger.log.fine("recoding obvious SourceFile="+obvious);
                 List<Attribute> newAttrs = new ArrayList<>(getAttributes());
                 int where = newAttrs.indexOf(olda);
                 newAttrs.set(where, a);
@@ -376,7 +376,7 @@ class Package {
                     || ic.outerClass == this.thisClass) {
                     // Add every relevant class to the IC attribute:
                     if (verbose > 1)
-                        Utils.log.fine("Relevant IC: "+ic);
+                        Pack200Logger.log.fine("Relevant IC: "+ic);
                     impliedICs.add(ic);
                 }
             }
@@ -437,7 +437,7 @@ class Package {
                     // Odd case:  No implied ICs, and a zero length attr.
                     // Do not support it directly.
                     if (verbose > 0)
-                        Utils.log.info("Warning: Dropping empty InnerClasses attribute from "+this);
+                        Pack200Logger.log.info("Warning: Dropping empty InnerClasses attribute from "+this);
                 }
             } else if (actualICs == null) {
                 // No local IC attribute, even though some are implied.
@@ -451,7 +451,7 @@ class Package {
             // Reduce the set to the symmetric difference.
             setInnerClasses(localICs);
             if (verbose > 1 && localICs != null)
-                Utils.log.fine("keeping local ICs in "+this+": "+localICs);
+                Pack200Logger.log.fine("keeping local ICs in "+this+": "+localICs);
         }
 
         /** When unpacking, undo the effect of minimizeLocalICs.
@@ -512,7 +512,7 @@ class Package {
                 return cpMap;
             }
             protected void visitRefs(int mode, Collection<Entry> refs) {
-                if (verbose > 2)  Utils.log.fine("visitRefs "+this);
+                if (verbose > 2)  Pack200Logger.log.fine("visitRefs "+this);
                 // Careful:  The descriptor is used by the package,
                 // but the classfile breaks it into component refs.
                 if (mode == VRM_CLASSIC) {
@@ -634,7 +634,7 @@ class Package {
         }
 
         protected void visitRefs(int mode, Collection<Entry> refs) {
-            if (verbose > 2)  Utils.log.fine("visitRefs "+this);
+            if (verbose > 2)  Pack200Logger.log.fine("visitRefs "+this);
             refs.add(thisClass);
             refs.add(superClass);
             refs.addAll(Arrays.asList(interfaces));
@@ -648,7 +648,7 @@ class Package {
                         ok = true;
                     } finally {
                         if (!ok)
-                            Utils.log.warning("Error scanning "+m);
+                            Pack200Logger.log.warning("Error scanning "+m);
                     }
                 }
             }
@@ -1107,7 +1107,7 @@ class Package {
     void stripAttributeKind(String what) {
         // what is one of { Debug, Compile, Constant, Exceptions, InnerClasses }
         if (verbose > 0)
-            Utils.log.info("Stripping "+what.toLowerCase()+" data and attributes...");
+            Pack200Logger.log.info("Stripping "+what.toLowerCase()+" data and attributes...");
         switch (what) {
             case "Debug":
                 strip("SourceFile");
@@ -1159,7 +1159,7 @@ class Package {
                     && f.getAttribute("ConstantValue") != null
                     && !f.getName().startsWith("serial")) {
                     if (verbose > 2) {
-                        Utils.log.fine(">> Strip "+this+" ConstantValue");
+                        Pack200Logger.log.fine(">> Strip "+this+" ConstantValue");
                         j.remove();
                     }
                 }
@@ -1243,28 +1243,28 @@ class Package {
             File file = i.previous();
             if (!file.isTrivialClassStub()) {
                 if (verbose > 1)
-                    Utils.log.fine("Keeping last non-trivial "+file);
+                    Pack200Logger.log.fine("Keeping last non-trivial "+file);
                 break;
             }
             if (verbose > 2)
-                Utils.log.fine("Removing trivial "+file);
+                Pack200Logger.log.fine("Removing trivial "+file);
             i.remove();
         }
 
         if (verbose > 0) {
-            Utils.log.info("Transmitting "+files.size()+" files, including per-file data for "+getClassStubs().size()+" classes out of "+classes.size());
+            Pack200Logger.log.info("Transmitting "+files.size()+" files, including per-file data for "+getClassStubs().size()+" classes out of "+classes.size());
         }
     }
 
     // Use this before writing the package file.
     void buildGlobalConstantPool(Set<Entry> requiredEntries) {
         if (verbose > 1)
-            Utils.log.fine("Checking for unused CP entries");
+            Pack200Logger.log.fine("Checking for unused CP entries");
         requiredEntries.add(getRefString(""));  // uconditionally present
         visitRefs(VRM_PACKAGE, requiredEntries);
         ConstantPool.completeReferencesIn(requiredEntries, false);
         if (verbose > 1)
-            Utils.log.fine("Sorting CP entries");
+            Pack200Logger.log.fine("Sorting CP entries");
         Index   cpAllU = ConstantPool.makeIndex("unsorted", requiredEntries);
         Index[] byTagU = ConstantPool.partitionByTag(cpAllU);
         for (int i = 0; i < ConstantPool.TAGS_IN_ORDER.length; i++) {
@@ -1284,7 +1284,7 @@ class Package {
             byte tag = ConstantPool.TAGS_IN_ORDER[i];
             Index ix = cp.getIndexByTag(tag);
             assert(ix.assertIsSorted());
-            if (verbose > 2)  Utils.log.fine(ix.dumpString());
+            if (verbose > 2)  Pack200Logger.log.fine(ix.dumpString());
         }
     }
 

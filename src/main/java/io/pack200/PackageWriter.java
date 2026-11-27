@@ -62,12 +62,12 @@ class PackageWriter extends BandStructure {
         boolean ok = false;
         try {
             if (verbose > 0) {
-                Utils.log.info("Setting up constant pool...");
+                Pack200Logger.log.info("Setting up constant pool...");
             }
             setup();
 
             if (verbose > 0) {
-                Utils.log.info("Packing...");
+                Pack200Logger.log.info("Packing...");
             }
 
             // writeFileHeader() is done last, since it has ultimate counts
@@ -83,7 +83,7 @@ class PackageWriter extends BandStructure {
 
             // choose codings (fill band_headers if needed)
             if (verbose > 0) {
-                Utils.log.info("Coding...");
+                Pack200Logger.log.info("Coding...");
             }
             all_bands.chooseBandCodings();
 
@@ -94,7 +94,7 @@ class PackageWriter extends BandStructure {
 
             ok = true;
         } catch (Exception ee) {
-            Utils.log.warning("Error on output: "+ee, ee);
+            Pack200Logger.log.warning("Error on output: "+ee, ee);
             //if (verbose > 0)  ee.printStackTrace();
             // Write partial output only if we are verbose.
             if (verbose > 0)  finalOut.close();
@@ -128,7 +128,7 @@ class PackageWriter extends BandStructure {
         if (pkg.packageVersion != null) {
             packageVersion = pkg.packageVersion;
             if (verbose > 0) {
-                Utils.log.info("package version overridden with: "
+                Pack200Logger.log.info("package version overridden with: "
                                 + packageVersion);
             }
             return;
@@ -153,7 +153,7 @@ class PackageWriter extends BandStructure {
         }
 
         if (verbose > 0) {
-            Utils.log.info("Highest version class file: " + highV
+            Pack200Logger.log.info("Highest version class file: " + highV
                     + " package version: " + packageVersion);
         }
     }
@@ -243,9 +243,9 @@ class PackageWriter extends BandStructure {
         if (bestVersion == null)  bestVersion = JAVA_MIN_CLASS_VERSION;  // degenerate case
         pkg.defaultClassVersion = bestVersion;
         if (verbose > 0)
-           Utils.log.info("Consensus version number in segment is " + bestVersion);
+           Pack200Logger.log.info("Consensus version number in segment is " + bestVersion);
         if (verbose > 0)
-            Utils.log.info("Highest version number in segment is "
+            Pack200Logger.log.info("Highest version number in segment is "
                             + pkg.getHighestClassVersion());
 
         // Now add explicit pseudo-attrs. to classes with odd versions.
@@ -253,7 +253,7 @@ class PackageWriter extends BandStructure {
             if (!cls.getVersion().equals(bestVersion)) {
                 Attribute a = makeClassFileVersionAttr(cls.getVersion());
                 if (verbose > 1) {
-                    Utils.log.fine("Version "+cls.getVersion() + " of " + cls
+                    Pack200Logger.log.fine("Version "+cls.getVersion() + " of " + cls
                                      + " doesn't match package version "
                                      + bestVersion);
                 }
@@ -268,7 +268,7 @@ class PackageWriter extends BandStructure {
             if (len != (int)len) {
                 archiveOptions |= AO_HAVE_FILE_SIZE_HI;
                 if (verbose > 0)
-                   Utils.log.info("Note: Huge resource file "+file.getFileName()+" forces 64-bit sizing");
+                   Pack200Logger.log.info("Note: Huge resource file "+file.getFileName()+" forces 64-bit sizing");
                 break;
             }
         }
@@ -295,7 +295,7 @@ class PackageWriter extends BandStructure {
             archiveOptions |= AO_HAVE_ALL_CODE_FLAGS;
         }
         if (verbose > 0)
-            Utils.log.info("archiveOptions = "
+            Pack200Logger.log.info("archiveOptions = "
                              +"0b"+Integer.toBinaryString(archiveOptions));
     }
 
@@ -376,7 +376,7 @@ class PackageWriter extends BandStructure {
         archive_header_0.putInt(packageVersion.minor);
         archive_header_0.putInt(packageVersion.major);
         if (verbose > 0)
-            Utils.log.info("Package Version for this segment:" + packageVersion);
+            Pack200Logger.log.info("Package Version for this segment:" + packageVersion);
         archive_header_0.putInt(archiveOptions); // controls header format
         assert(archive_header_0.length() == AH_LENGTH_0);
 
@@ -441,7 +441,7 @@ class PackageWriter extends BandStructure {
             archiveSize0 += UNSIGNED5.getLength(archiveSizeLo) - zeroLen;
         }
         if (verbose > 1)
-            Utils.log.fine("archive sizes: "+
+            Pack200Logger.log.fine("archive sizes: "+
                              archiveSize0+"+"+archiveSize1);
         assert(all_bands.outputSize() == archiveSize0+archiveSize1);
     }
@@ -509,14 +509,14 @@ class PackageWriter extends BandStructure {
     void writeConstantPool() throws IOException {
         IndexGroup cp = pkg.cp;
 
-        if (verbose > 0)  Utils.log.info("Writing CP");
+        if (verbose > 0)  Pack200Logger.log.info("Writing CP");
 
         for (byte tag : ConstantPool.TAGS_IN_ORDER) {
             Index index = cp.getIndexByTag(tag);
 
             Entry[] cpMap = index.cpMap;
             if (verbose > 0)
-                Utils.log.info("Writing "+cpMap.length+" "+ConstantPool.tagName(tag)+" entries...");
+                Pack200Logger.log.info("Writing "+cpMap.length+" "+ConstantPool.tagName(tag)+" entries...");
 
             if (optDumpBands) {
                 try (PrintStream ps = new PrintStream(getDumpStream(index, ".idx"))) {
@@ -631,7 +631,7 @@ class PackageWriter extends BandStructure {
                 if (index == null || index.isEmpty())  continue;
                 Entry[] cpMap = index.cpMap;
                 if (verbose > 1)
-                    Utils.log.info("Index group "+ConstantPool.tagName(tag)+" contains "+cpMap.length+" entries.");
+                    Pack200Logger.log.info("Index group "+ConstantPool.tagName(tag)+" contains "+cpMap.length+" entries.");
                 if (optDumpBands) {
                     try (PrintStream ps = new PrintStream(getDumpStream(index.debugName, tag, ".gidx", index))) {
                         printArrayTo(ps, cpMap, 0, cpMap.length, true);
@@ -728,7 +728,7 @@ class PackageWriter extends BandStructure {
             int normCharCount = cp_Utf8_chars.length();
             int packCharCount = cp_Utf8_big_chars.length();
             int charCount = normCharCount + packCharCount;
-            Utils.log.info("Utf8string #CHARS="+charCount+" #PACKEDCHARS="+packCharCount);
+            Pack200Logger.log.info("Utf8string #CHARS="+charCount+" #PACKEDCHARS="+packCharCount);
         }
     }
 
@@ -746,19 +746,19 @@ class PackageWriter extends BandStructure {
         final int BYTE_SIZE = CodingChooser.BYTE_SIZE;
         final int ZIP_SIZE = CodingChooser.ZIP_SIZE;
         if (verbose > 1 || cc.verbose > 1) {
-            Utils.log.fine("--- chooseCoding "+bandName);
+            Pack200Logger.log.fine("--- chooseCoding "+bandName);
         }
         CodingMethod special = cc.choose(cvals, bigRegular, sizes);
         Coding charRegular = cp_Utf8_chars.regularCoding;
         if (verbose > 1)
-            Utils.log.fine("big string["+i+"] len="+suffix+" #wide="+numWide+" size="+sizes[BYTE_SIZE]+"/z="+sizes[ZIP_SIZE]+" coding "+special);
+            Pack200Logger.log.fine("big string["+i+"] len="+suffix+" #wide="+numWide+" size="+sizes[BYTE_SIZE]+"/z="+sizes[ZIP_SIZE]+" coding "+special);
         if (special != charRegular) {
             int specialZipSize = sizes[ZIP_SIZE];
             int[] normalSizes = cc.computeSize(charRegular, cvals);
             int normalZipSize = normalSizes[ZIP_SIZE];
             int minWin = Math.max(5, normalZipSize/1000);
             if (verbose > 1)
-                Utils.log.fine("big string["+i+"] normalSize="+normalSizes[BYTE_SIZE]+"/z="+normalSizes[ZIP_SIZE]+" win="+(specialZipSize<normalZipSize-minWin));
+                Pack200Logger.log.fine("big string["+i+"] normalSize="+normalSizes[BYTE_SIZE]+"/z="+normalSizes[ZIP_SIZE]+" win="+(specialZipSize<normalZipSize-minWin));
             if (specialZipSize < normalZipSize-minWin) {
                 IntBand big = cp_Utf8_big_chars.newIntBand(bandName);
                 big.initializeValues(cvals);
@@ -819,10 +819,10 @@ class PackageWriter extends BandStructure {
                 file_options.putInt(file.options);
             file.writeTo(file_bits.collectorStream());
             if (verbose > 1)
-                Utils.log.fine("Wrote "+len+" bytes of "+file.name.stringValue());
+                Pack200Logger.log.fine("Wrote "+len+" bytes of "+file.name.stringValue());
         }
         if (verbose > 0)
-            Utils.log.info("Wrote "+numFiles+" resource files");
+            Pack200Logger.log.info("Wrote "+numFiles+" resource files");
     }
 
     void collectAttributeLayouts() {
@@ -856,11 +856,11 @@ class PackageWriter extends BandStructure {
                 archiveOptions |= mask;
                 haveLongFlags = true;
                 if (verbose > 0)
-                   Utils.log.info("Note: Many "+Attribute.contextName(i)+" attributes forces 63-bit flags");
+                   Pack200Logger.log.info("Note: Many "+Attribute.contextName(i)+" attributes forces 63-bit flags");
             }
             if (verbose > 1) {
-                Utils.log.fine(Attribute.contextName(i)+".maxFlags = 0x"+Integer.toHexString(maxFlags[i]));
-                Utils.log.fine(Attribute.contextName(i)+".#layouts = "+nl);
+                Pack200Logger.log.fine(Attribute.contextName(i)+".maxFlags = 0x"+Integer.toHexString(maxFlags[i]));
+                Pack200Logger.log.fine(Attribute.contextName(i)+".#layouts = "+nl);
             }
             assert(haveFlagsHi(i) == haveLongFlags);
         }
@@ -947,9 +947,9 @@ class PackageWriter extends BandStructure {
                     requiredEntries.add(le);
                     if (verbose > 0) {
                         if (index < attrIndexLimit[i])
-                           Utils.log.info("Using free flag bit 1<<"+index+" for "+count+" occurrences of "+def);
+                           Pack200Logger.log.info("Using free flag bit 1<<"+index+" for "+count+" occurrences of "+def);
                         else
-                            Utils.log.info("Using overflow index "+index+" for "+count+" occurrences of "+def);
+                            Pack200Logger.log.info("Using overflow index "+index+" for "+count+" occurrences of "+def);
                     }
                 }
             }
@@ -1177,14 +1177,14 @@ class PackageWriter extends BandStructure {
         pkg.classes.toArray(classes);
         // Note:  This code respects the order in which caller put classes.
         if (verbose > 0)
-            Utils.log.info("  ...scanning "+classes.length+" classes...");
+            Pack200Logger.log.info("  ...scanning "+classes.length+" classes...");
 
         int nwritten = 0;
         for (int i = 0; i < classes.length; i++) {
             // Collect the class body, sans bytecodes.
             Class cls = classes[i];
             if (verbose > 1)
-                Utils.log.fine("Scanning "+cls);
+                Pack200Logger.log.fine("Scanning "+cls);
 
             ClassEntry   thisClass  = cls.thisClass;
             ClassEntry   superClass = cls.superClass;
@@ -1204,7 +1204,7 @@ class PackageWriter extends BandStructure {
 
             nwritten++;
             if (verbose > 0 && (nwritten % 1000) == 0)
-                Utils.log.info("Have scanned "+nwritten+" classes...");
+                Pack200Logger.log.info("Have scanned "+nwritten+" classes...");
         }
     }
 
@@ -1238,7 +1238,7 @@ class PackageWriter extends BandStructure {
             sc = LONG_CODE_HEADER;
         if (verbose > 2) {
             int siglen = c.getMethod().getArgumentSize();
-            Utils.log.fine("Code sizes info "+c.max_stack+" "+c.max_locals+" "+c.getHandlerCount()+" "+siglen+" "+na+(sc > 0 ? " SHORT="+sc : ""));
+            Pack200Logger.log.fine("Code sizes info "+c.max_stack+" "+c.max_locals+" "+c.getHandlerCount()+" "+siglen+" "+na+(sc > 0 ? " SHORT="+sc : ""));
         }
         code_headers.putByte(sc);
         if (sc == LONG_CODE_HEADER) {
@@ -1287,7 +1287,7 @@ class PackageWriter extends BandStructure {
             return;
         }
         if (verbose > 3)
-            Utils.log.fine("Transmitting attrs for "+h+" flags="+Integer.toHexString(h.flags));
+            Pack200Logger.log.fine("Transmitting attrs for "+h+" flags="+Integer.toHexString(h.flags));
 
         long flagMask = attrFlagMask[ctype];  // which flags are attr bits?
         long flagsToAdd = 0;
@@ -1297,10 +1297,10 @@ class PackageWriter extends BandStructure {
             int index = (attrIndexTable.get(def)).intValue();
             assert(attrDefs.get(ctype).get(index) == def);
             if (verbose > 3)
-                Utils.log.fine("add attr @"+index+" "+a+" in "+h);
+                Pack200Logger.log.fine("add attr @"+index+" "+a+" in "+h);
             if (index < attrIndexLimit[ctype] && testBit(flagMask, 1L<<index)) {
                 if (verbose > 3)
-                    Utils.log.fine("Adding flag bit 1<<"+index+" in "+Long.toHexString(flagMask));
+                    Pack200Logger.log.fine("Adding flag bit 1<<"+index+" in "+Long.toHexString(flagMask));
                 assert(!testBit(h.flags, 1L<<index));
                 flagsToAdd |= (1L<<index);
                 flagMask -= (1L<<index);  // do not use this bit twice here
@@ -1309,7 +1309,7 @@ class PackageWriter extends BandStructure {
                 flagsToAdd |= (1L<<X_ATTR_OVERFLOW);
                 overflowCount += 1;
                 if (verbose > 3)
-                    Utils.log.fine("Adding overflow attr #"+overflowCount);
+                    Pack200Logger.log.fine("Adding overflow attr #"+overflowCount);
                 IntBand xxx_attr_indexes = getAttrBand(xxx_attr_bands, AB_ATTR_INDEXES);
                 xxx_attr_indexes.putInt(index);
                 // System.out.println("overflow @"+index);
@@ -1331,7 +1331,7 @@ class PackageWriter extends BandStructure {
             assert(bc != null);
             assert(bc.length == def.getCallables().length);
             // Write one attribute of type def into ab.
-            if (verbose > 2)  Utils.log.fine("writing "+a+" in "+h);
+            if (verbose > 2)  Pack200Logger.log.fine("writing "+a+" in "+h);
             boolean isCV = (ctype == ATTR_CONTEXT_FIELD && def == attrConstantValue);
             if (isCV)  setConstantValueIndex((Class.Field)h);
             a.parse(cls, a.bytes(), 0, a.size(),
@@ -1434,7 +1434,7 @@ class PackageWriter extends BandStructure {
 
         for (Instruction i = code.instructionAt(0); i != null; i = i.next()) {
             // %%% Add a stress mode which issues _ref/_byte_escape.
-            if (verbose > 3)  Utils.log.fine(i.toString());
+            if (verbose > 3)  Pack200Logger.log.fine(i.toString());
 
             if (i.isNonstandard()) {
                 // Crash and burn with a complaint if there are funny
@@ -1442,14 +1442,14 @@ class PackageWriter extends BandStructure {
                 String complaint = code.getMethod()
                     +" contains an unrecognized bytecode "+i
                     +"; please use the pass-file option on this class.";
-                Utils.log.warning(complaint);
+                Pack200Logger.log.warning(complaint);
                 throw new IOException(complaint);
             }
 
             if (i.isWide()) {
                 if (verbose > 1) {
-                    Utils.log.fine("_wide opcode in "+code);
-                    Utils.log.fine(i.toString());
+                    Pack200Logger.log.fine("_wide opcode in "+code);
+                    Pack200Logger.log.fine(i.toString());
                 }
                 bc_codes.putByte(_wide);
                 codeHist[_wide]++;
@@ -1638,7 +1638,7 @@ class PackageWriter extends BandStructure {
                     String complaint = code.getMethod() +
                         " contains a bytecode " + i +
                         " with an unsupported constant reference; please use the pass-file option on this class.";
-                    Utils.log.warning(complaint);
+                    Pack200Logger.log.warning(complaint);
                     throw new IOException(complaint);
                 }
                 bc_codes.putByte(vbc);

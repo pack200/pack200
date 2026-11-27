@@ -102,7 +102,7 @@ public class UnpackerImpl extends TLGlobals implements Pack200.Unpacker {
             BufferedInputStream in0 = new BufferedInputStream(in);
             if (Utils.isJarMagic(Utils.readMagic(in0))) {
                 if (verbose > 0)
-                    Utils.log.info("Copying unpacked JAR file...");
+                    Pack200Logger.log.info("Copying unpacked JAR file...");
                 Utils.copyJarFile(new JarInputStream(in0), out);
             } else if (props.getBoolean(Utils.DEBUG_DISABLE_NATIVE)) {
                 (new DoUnpack()).run(in0, out);
@@ -198,7 +198,7 @@ public class UnpackerImpl extends TLGlobals implements Pack200.Unpacker {
                 // Try to get another segment.
                 if (!Utils.isPackMagic(Utils.readMagic(in)))  break;
                 if (verbose > 0)
-                    Utils.log.info("Finished segment #"+seg);
+                    Pack200Logger.log.info("Finished segment #"+seg);
             }
         }
 
@@ -239,7 +239,7 @@ public class UnpackerImpl extends TLGlobals implements Pack200.Unpacker {
                 je.setMethod(deflate ? JarEntry.DEFLATED : JarEntry.STORED);
                 if (needCRC) {
                     if (verbose > 0)
-                        Utils.log.info("stored size="+bufOut.size()+" and crc="+crc.getValue());
+                        Pack200Logger.log.info("stored size="+bufOut.size()+" and crc="+crc.getValue());
 
                     je.setMethod(JarEntry.STORED);
                     je.setSize(bufOut.size());
@@ -256,7 +256,7 @@ public class UnpackerImpl extends TLGlobals implements Pack200.Unpacker {
                 bufOut.writeTo(out);
                 out.closeEntry();
                 if (verbose > 0)
-                    Utils.log.info("Writing "+Utils.zeString((ZipEntry)je));
+                    Pack200Logger.log.info("Writing "+Utils.zeString((ZipEntry)je));
             }
             assert(classesToWrite.isEmpty());
             props.setProperty(Pack200.Unpacker.PROGRESS,"100");

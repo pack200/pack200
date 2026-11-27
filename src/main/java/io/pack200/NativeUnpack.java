@@ -138,7 +138,7 @@ class NativeUnpack {
             pbuf.put(_buf, 0, nr);
         }
         if (_verbose > 1)
-            Utils.log.fine("readInputFn("+minlen+","+maxlen+") => "+numread+" steps="+steps);
+            Pack200Logger.log.fine("readInputFn("+minlen+","+maxlen+") => "+numread+" steps="+steps);
         if (maxlen > 100) {
             _estByteLimit = _byteCount + maxlen;
         } else {
@@ -166,18 +166,18 @@ class NativeUnpack {
             _prevPercent = percent;
             _props.setInteger(Pack200.Unpacker.PROGRESS, percent);
             if (_verbose > 0)
-                Utils.log.info("progress = "+percent);
+                Pack200Logger.log.info("progress = "+percent);
         }
     }
 
     private void copyInOption(String opt) {
         String val = _props.getProperty(opt);
         if (_verbose > 0)
-            Utils.log.info("set "+opt+"="+val);
+            Pack200Logger.log.info("set "+opt+"="+val);
         if (val != null) {
             boolean set = setOption(opt, val);
             if (!set)
-                Utils.log.warning("Invalid option "+opt+"="+val);
+                Pack200Logger.log.warning("Invalid option "+opt+"="+val);
         }
     }
 
@@ -238,14 +238,14 @@ class NativeUnpack {
                 consumed = finish();
             }
             if (_verbose > 0)
-                Utils.log.info("bytes consumed = "+consumed);
+                Pack200Logger.log.info("bytes consumed = "+consumed);
             if (presetInput == null &&
                 !Utils.isPackMagic(Utils.readMagic(in0))) {
                 break;
             }
             if (_verbose > 0 ) {
                 if (presetInput != null)
-                    Utils.log.info("unused input = "+presetInput);
+                    Pack200Logger.log.info("unused input = "+presetInput);
             }
         }
     }
@@ -272,7 +272,7 @@ class NativeUnpack {
         int size = (int) lsize;
 
         if (_verbose > 1) {
-            Utils.log.fine("Writing entry: " + name + " size=" + size +
+            Pack200Logger.log.fine("Writing entry: " + name + " size=" + size +
                     (deflateHint ? " deflated" : ""));
         }
 
@@ -294,7 +294,7 @@ class NativeUnpack {
         }
         j.closeEntry();
 
-        if (_verbose > 0) Utils.log.info("Writing " + Utils.zeString(z));
+        if (_verbose > 0) Pack200Logger.log.info("Writing " + Utils.zeString(z));
     }
 
     private void writeEntryData(JarOutputStream j, ZipEntry z, ByteBuffer data0,

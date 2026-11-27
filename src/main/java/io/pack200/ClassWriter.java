@@ -65,7 +65,7 @@ class ClassWriter {
                                                    cls.getBootstrapMethodMap());
         }
         if (verbose > 1)
-            Utils.log.fine("local CP="+(verbose > 2 ? cpIndex.dumpString() : cpIndex.toString()));
+            Pack200Logger.log.fine("local CP="+(verbose > 2 ? cpIndex.dumpString() : cpIndex.toString()));
     }
 
     private void writeShort(int x) throws IOException {
@@ -90,7 +90,7 @@ class ClassWriter {
     void write() throws IOException {
         boolean ok = false;
         try {
-            if (verbose > 1)  Utils.log.fine("...writing "+cls);
+            if (verbose > 1)  Pack200Logger.log.fine("...writing "+cls);
             writeMagicNumbers();
             writeConstantPool();
             writeHeader();
@@ -106,7 +106,7 @@ class ClassWriter {
             ok = true;
         } finally {
             if (!ok) {
-                Utils.log.warning("Error on output of "+cls);
+                Pack200Logger.log.warning("Error on output of "+cls);
             }
         }
     }
@@ -125,7 +125,7 @@ class ClassWriter {
             assert((e == null) == (i == 0 || cpMap[i-1] != null && cpMap[i-1].isDoubleWord()));
             if (e == null)  continue;
             byte tag = e.getTag();
-            if (verbose > 2)  Utils.log.fine("   CP["+i+"] = "+e);
+            if (verbose > 2)  Pack200Logger.log.fine("   CP["+i+"] = "+e);
             out.write(tag);
             switch (tag) {
                 case CONSTANT_Signature:
@@ -199,7 +199,7 @@ class ClassWriter {
     }
 
     void writeMember(Class.Member m, boolean doMethod) throws IOException {
-        if (verbose > 2)  Utils.log.fine("writeMember "+m);
+        if (verbose > 2)  Pack200Logger.log.fine("writeMember "+m);
         writeShort(m.flags);
         writeRef(m.getDescriptor().nameRef);
         writeRef(m.getDescriptor().typeRef);
@@ -263,12 +263,12 @@ class ClassWriter {
                 }
                 out = savedOut;
                 if (verbose > 2)
-                    Utils.log.fine("Attribute "+a.name()+" ["+buf.size()+"]");
+                    Pack200Logger.log.fine("Attribute "+a.name()+" ["+buf.size()+"]");
                 writeInt(buf.size());
                 buf.writeTo(out);
             } else {
                 if (verbose > 2)
-                    Utils.log.fine("Attribute "+a.name()+" ["+a.size()+"]");
+                    Pack200Logger.log.fine("Attribute "+a.name()+" ["+a.size()+"]");
                 writeInt(a.size());
                 out.write(a.bytes());
             }

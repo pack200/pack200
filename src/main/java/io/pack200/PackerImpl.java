@@ -131,7 +131,7 @@ public class PackerImpl  extends TLGlobals implements Pack200.Packer {
 
         {
             props.setInteger(Pack200.Packer.PROGRESS, 0);
-            if (verbose > 0) Utils.log.info(props.toString());
+            if (verbose > 0) Pack200Logger.log.info(props.toString());
         }
 
         // Here's where the bits are collected before getting packed, we also
@@ -192,7 +192,7 @@ public class PackerImpl  extends TLGlobals implements Pack200.Packer {
                     } else {
                         Attribute.define(lattrDefs, ctypes[i], name, layout);
                         if (verbose > 1) {
-                            Utils.log.fine("Added layout for "+Constants.ATTR_CONTEXT_NAME[i]+" attribute "+name+" = "+layout);
+                            Pack200Logger.log.fine("Added layout for "+Constants.ATTR_CONTEXT_NAME[i]+" attribute "+name+" = "+layout);
                         }
                         assert(lattrDefs.containsKey(lkey));
                     }
@@ -258,7 +258,7 @@ public class PackerImpl  extends TLGlobals implements Pack200.Packer {
                     file = file.substring(0, file.length()-1);
                 i.set(file);
             }
-            if (verbose > 0) Utils.log.info("passFiles = " + passFiles);
+            if (verbose > 0) Pack200Logger.log.info("passFiles = " + passFiles);
         }
 
         {
@@ -347,7 +347,7 @@ public class PackerImpl  extends TLGlobals implements Pack200.Packer {
                 if ((int)seconds == seconds) {
                     return (int)seconds;
                 } else {
-                    Utils.log.warning("overflow in modtime for "+f);
+                    Pack200Logger.log.warning("overflow in modtime for "+f);
                     return Constants.NO_MODTIME;
                 }
             }
@@ -372,9 +372,9 @@ public class PackerImpl  extends TLGlobals implements Pack200.Packer {
         private void noteRead(InFile f) {
             nread++;
             if (verbose > 2)
-                Utils.log.fine("...read "+f.name);
+                Pack200Logger.log.fine("...read "+f.name);
             if (verbose > 0 && (nread % 1000) == 0)
-                Utils.log.info("Have read "+nread+" files...");
+                Pack200Logger.log.info("Have read "+nread+" files...");
         }
 
         void run(JarInputStream in, OutputStream out) throws IOException {
@@ -404,7 +404,7 @@ public class PackerImpl  extends TLGlobals implements Pack200.Packer {
                     flushPartial(out, nextCount);
                 }
                 if (verbose > 1) {
-                    Utils.log.fine("Reading " + name);
+                    Pack200Logger.log.fine("Reading " + name);
                 }
 
                 assert(je.isDirectory() == name.endsWith("/"));
@@ -426,7 +426,7 @@ public class PackerImpl  extends TLGlobals implements Pack200.Packer {
             List<InFile> inFiles = scanJar(in);
 
             if (verbose > 0)
-                Utils.log.info("Reading " + inFiles.size() + " files...");
+                Pack200Logger.log.info("Reading " + inFiles.size() + " files...");
 
             int numDone = 0;
             for (InFile inFile : inFiles) {
@@ -443,12 +443,12 @@ public class PackerImpl  extends TLGlobals implements Pack200.Packer {
                     float filesToDo = inFiles.size() - filesDone;
                     float segsToDo  = filesToDo * (segsDone/filesDone);
                     if (verbose > 1)
-                        Utils.log.fine("Estimated segments to do: "+segsToDo);
+                        Pack200Logger.log.fine("Estimated segments to do: "+segsToDo);
                     flushPartial(out, (int) Math.ceil(segsToDo));
                 }
                 InputStream strm = inFile.getInputStream();
                 if (verbose > 1)
-                    Utils.log.fine("Reading " + name);
+                    Pack200Logger.log.fine("Reading " + name);
                 Package.File file = null;
                 if (inFile.mustProcess()) {
                     file = readClass(name, strm);
@@ -484,16 +484,16 @@ public class PackerImpl  extends TLGlobals implements Pack200.Packer {
                     Attribute.FormatException ee = (Attribute.FormatException) ioe;
                     // He passed up the category to us in layout.
                     if (ee.layout.equals(Pack200.Packer.PASS)) {
-                        Utils.log.info(ee.toString());
-                        Utils.log.warning(message + " unrecognized attribute: " +
+                        Pack200Logger.log.info(ee.toString());
+                        Pack200Logger.log.warning(message + " unrecognized attribute: " +
                                 fname);
                         return null;
                     }
                 } else if (ioe instanceof ClassReader.ClassFormatException) {
                     ClassReader.ClassFormatException ce = (ClassReader.ClassFormatException) ioe;
                     if (classFormatCommand.equals(Pack200.Packer.PASS)) {
-                        Utils.log.info(ce.toString());
-                        Utils.log.warning(message + " unknown class format: " +
+                        Pack200Logger.log.info(ce.toString());
+                        Pack200Logger.log.warning(message + " unknown class format: " +
                                 fname);
                         return null;
                     }
@@ -537,7 +537,7 @@ public class PackerImpl  extends TLGlobals implements Pack200.Packer {
             segmentTotalSize += segmentSize;
             segmentSize = 0;
             if (verbose > 0 && segmentCount > 1) {
-                Utils.log.info("Transmitted "
+                Pack200Logger.log.info("Transmitted "
                                  +segmentTotalSize+" input bytes in "
                                  +segmentCount+" segments totaling "
                                  +totalOutputSize+" bytes");
@@ -553,7 +553,7 @@ public class PackerImpl  extends TLGlobals implements Pack200.Packer {
             if (!keepFileOrder) {
                 // Keeping the order of classes costs about 1%
                 // Keeping the order of all files costs something more.
-                if (verbose > 1)  Utils.log.fine("Reordering files.");
+                if (verbose > 1)  Pack200Logger.log.fine("Reordering files.");
                 boolean stripDirectories = true;
                 pkg.reorderFiles(keepClassOrder, stripDirectories);
             } else {
@@ -582,7 +582,7 @@ public class PackerImpl  extends TLGlobals implements Pack200.Packer {
                 long outSize = pw.archiveSize0+pw.archiveSize1;
                 totalOutputSize += outSize;
                 long inSize = segmentSize;
-                Utils.log.info("Transmitted "
+                Pack200Logger.log.info("Transmitted "
                                  +nfiles+" files of "
                                  +inSize+" input bytes in a segment of "
                                  +outSize+" bytes");

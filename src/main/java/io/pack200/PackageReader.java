@@ -181,9 +181,9 @@ class PackageReader extends BandStructure {
 
             ok = true;
         } catch (Exception ee) {
-            Utils.log.warning("Error on input: "+ee, ee);
+            Pack200Logger.log.warning("Error on input: "+ee, ee);
             if (verbose > 0)
-                Utils.log.info("Stream offsets:"+
+                Pack200Logger.log.info("Stream offsets:"+
                                  " served="+in.getBytesServed()+
                                  " buffered="+in.buffered+
                                  " limit="+in.limit);
@@ -446,11 +446,11 @@ class PackageReader extends BandStructure {
     Index initCPIndex(byte tag, Entry[] cpMap) {
         if (verbose > 3) {
             for (int i = 0; i < cpMap.length; i++) {
-                Utils.log.fine("cp.add "+cpMap[i]);
+                Pack200Logger.log.fine("cp.add "+cpMap[i]);
             }
         }
         Index index = ConstantPool.makeIndex(ConstantPool.tagName(tag), cpMap);
-        if (verbose > 1)  Utils.log.fine("Read "+index);
+        if (verbose > 1)  Pack200Logger.log.fine("Read "+index);
         pkg.cp.initIndexByTag(tag, index);
         return index;
     }
@@ -475,7 +475,7 @@ class PackageReader extends BandStructure {
         //        cp_Method
         //        cp_Imethod
 
-        if (verbose > 0)  Utils.log.info("Reading CP");
+        if (verbose > 0)  Pack200Logger.log.info("Reading CP");
 
         for (int k = 0; k < ConstantPool.TAGS_IN_ORDER.length; k++) {
             byte tag = ConstantPool.TAGS_IN_ORDER[k];
@@ -483,7 +483,7 @@ class PackageReader extends BandStructure {
 
             Entry[] cpMap = new Entry[len];
             if (verbose > 0)
-                Utils.log.info("Reading "+cpMap.length+" "+ConstantPool.tagName(tag)+" entries...");
+                Pack200Logger.log.info("Reading "+cpMap.length+" "+ConstantPool.tagName(tag)+" entries...");
 
             switch (tag) {
             case CONSTANT_Utf8:
@@ -690,7 +690,7 @@ class PackageReader extends BandStructure {
                 if (index == null || index.isEmpty())  continue;
                 Entry[] cpMap = index.cpMap;
                 if (verbose > 1)
-                    Utils.log.info("Index group "+ConstantPool.tagName(tag)+" contains "+cpMap.length+" entries.");
+                    Pack200Logger.log.info("Index group "+ConstantPool.tagName(tag)+" contains "+cpMap.length+" entries.");
                 if (optDumpBands) {
                     try (PrintStream ps = new PrintStream(getDumpStream(index.debugName, tag, ".gidx", index))) {
                         printArrayTo(ps, cpMap, 0, cpMap.length, true);
@@ -908,7 +908,7 @@ class PackageReader extends BandStructure {
         //        *file_options :UNSIGNED5
         //        *file_bits :BYTE1
         if (verbose > 0)
-            Utils.log.info("  ...building "+numFiles+" files...");
+            Pack200Logger.log.info("  ...building "+numFiles+" files...");
         file_name.expectLength(numFiles);
         file_size_lo.expectLength(numFiles);
         int options = archiveOptions;
@@ -956,7 +956,7 @@ class PackageReader extends BandStructure {
             if (haveOptions)
                 file.options |= file_options.getInt();
             if (verbose > 1)
-                Utils.log.fine("Reading "+size+" bytes of "+name.stringValue());
+                Pack200Logger.log.fine("Reading "+size+" bytes of "+name.stringValue());
             long toRead = size;
             while (toRead > 0) {
                 int nr = buf.length;
@@ -1139,7 +1139,7 @@ class PackageReader extends BandStructure {
         //        code_bands
         Class[] classes = new Class[numClasses];
         if (verbose > 0)
-            Utils.log.info("  ...building "+classes.length+" classes...");
+            Pack200Logger.log.info("  ...building "+classes.length+" classes...");
 
         class_this.expectLength(numClasses);
         class_super.expectLength(numClasses);
@@ -1207,7 +1207,7 @@ class PackageReader extends BandStructure {
     };
 
     void reconstructClass(Class cls) {
-        if (verbose > 1)  Utils.log.fine("reconstruct "+cls);
+        if (verbose > 1)  Pack200Logger.log.fine("reconstruct "+cls);
 
         // check for local .ClassFile.version
         Attribute retroVersion = cls.getAttribute(attrClassFileVersion);
@@ -1295,13 +1295,13 @@ class PackageReader extends BandStructure {
         Arrays.sort(cpMap, narrowLimit, fillp, entryOutputOrder);
 
         if (verbose > 3) {
-            Utils.log.fine("CP of "+this+" {");
+            Pack200Logger.log.fine("CP of "+this+" {");
             for (int i = 0; i < fillp; i++) {
                 Entry e = cpMap[i];
-                Utils.log.fine("  "+((e==null)?-1:getOutputIndex(e))
+                Pack200Logger.log.fine("  "+((e==null)?-1:getOutputIndex(e))
                                    +" : "+e);
             }
-            Utils.log.fine("}");
+            Pack200Logger.log.fine("}");
         }
 
         // Now repack backwards, introducing null elements.
@@ -1340,7 +1340,7 @@ class PackageReader extends BandStructure {
         int totalNM = class_method_count.getIntTotal();
         field_descr.expectLength(totalNF);
         method_descr.expectLength(totalNM);
-        if (verbose > 1)  Utils.log.fine("expecting #fields="+totalNF+
+        if (verbose > 1)  Pack200Logger.log.fine("expecting #fields="+totalNF+
                 " and #methods="+totalNM+" in #classes="+numClasses);
 
         List<Class.Field> fields = new ArrayList<>(totalNF);
@@ -1415,7 +1415,7 @@ class PackageReader extends BandStructure {
             int sc = code_headers.getByte();
             assert(sc == (sc & 0xFF));
             if (verbose > 2)
-                Utils.log.fine("codeHeader "+c+" = "+sc);
+                Pack200Logger.log.fine("codeHeader "+c+" = "+sc);
             if (sc == LONG_CODE_HEADER) {
                 // We will read ms/ml/nh/flags from bands shortly.
                 longCodes.add(c);
@@ -1587,7 +1587,7 @@ class PackageReader extends BandStructure {
         MultiBand xxx_attr_bands = attrBands[ctype];
         long flagMask = attrFlagMask[ctype];
         if (verbose > 1) {
-            Utils.log.fine("scanning flags and attrs for "+
+            Pack200Logger.log.fine("scanning flags and attrs for "+
                     Attribute.contextName(ctype)+"["+holders.size()+"]");
         }
 
@@ -1807,7 +1807,7 @@ class PackageReader extends BandStructure {
                 boolean isCV = (ctype == ATTR_CONTEXT_FIELD && def == attrConstantValue);
                 if (isCV)  setConstantValueIndex((Class.Field)h);
                 if (verbose > 2)
-                    Utils.log.fine("read "+a+" in "+h);
+                    Pack200Logger.log.fine("read "+a+" in "+h);
                 final Band[] ab = attrBandTable.get(def);
                 // Read one attribute of type def from ab into a byte array.
                 buf.reset();
@@ -2390,7 +2390,7 @@ class PackageReader extends BandStructure {
                     }
                     // Random bytecode.  Just copy it.
                     if (bc >= _bytecode_limit)
-                        Utils.log.warning("unrecognized bytescode "+bc
+                        Pack200Logger.log.warning("unrecognized bytescode "+bc
                                             +" "+Instruction.byteName(bc));
                     assert(bc < _bytecode_limit);
                     buf[pc++] = (byte) bc;
@@ -2420,7 +2420,7 @@ class PackageReader extends BandStructure {
             }
             if (fixupBuf.size() > 0) {
                 if (verbose > 2)
-                    Utils.log.fine("Fixups in code: "+fixupBuf);
+                    Pack200Logger.log.fine("Fixups in code: "+fixupBuf);
                 code.addFixups(fixupBuf);
             }
         }

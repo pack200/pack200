@@ -38,8 +38,6 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.JarInputStream;
 import java.util.jar.JarOutputStream;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 
 class Utils {
@@ -155,50 +153,6 @@ class Utils {
 
     static final boolean SORT_BSS_BSM_MAJOR
         = Boolean.getBoolean(COM_PREFIX+"sort.bss.bsm.major");
-
-    static class Pack200Logger {
-        private final String name;
-        private Logger log;
-        Pack200Logger(String name) {
-            this.name = name;
-        }
-
-        private synchronized Logger getLogger() {
-            if (log == null) {
-                log = Logger.getLogger(name);
-            }
-            return log;
-        }
-
-        public void warning(String msg, Object param) {
-                getLogger().log(Level.WARNING, msg, param);
-            }
-
-        public void warning(String msg) {
-            warning(msg, null);
-        }
-
-        public void info(String msg) {
-            int verbose = currentPropMap().getInteger(DEBUG_VERBOSE);
-            if (verbose > 0) {
-                if (nolog) {
-                    System.out.println(msg);
-                } else {
-                    getLogger().info(msg);
-                }
-            }
-        }
-
-        public void fine(String msg) {
-            int verbose = currentPropMap().getInteger(DEBUG_VERBOSE);
-            if (verbose > 0) {
-                    System.out.println(msg);
-            }
-        }
-    }
-
-    static final Pack200Logger log
-        = new Pack200Logger("io.pack200.Pack200");
 
     // Returns the Max Version String of this implementation
     static String getVersionString() {

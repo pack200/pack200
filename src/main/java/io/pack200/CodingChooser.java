@@ -339,7 +339,7 @@ class CodingChooser {
             int nextMaxd = updateDistances(nextChoice);
             if (nextChoice == bestChoice) {
                 maxd = nextMaxd;
-                if (verbose > 5)  Utils.log.info("maxd = "+maxd);
+                if (verbose > 5)  Pack200Logger.log.info("maxd = "+maxd);
             }
         }
 
@@ -348,7 +348,7 @@ class CodingChooser {
         assert(plainBest == bestMethod);
 
         if (verbose > 2) {
-            Utils.log.info("chooser: plain result="+bestChoice+" after "+bestChoice.searchOrder+" rounds, "+(regularChoice.zipSize-bestZipSize)+" fewer bytes than regular "+regular);
+            Pack200Logger.log.info("chooser: plain result="+bestChoice+" after "+bestChoice.searchOrder+" rounds, "+(regularChoice.zipSize-bestZipSize)+" fewer bytes than regular "+regular);
         }
         bestChoice = null;
 
@@ -372,7 +372,7 @@ class CodingChooser {
             sizes[ZIP_SIZE]  = bestZipSize;
         }
         if (verbose > 1) {
-            Utils.log.info("chooser: result="+bestMethod+" "+
+            Pack200Logger.log.info("chooser: result="+bestMethod+" "+
                              (zipSize1-bestZipSize)+
                              " fewer bytes than regular "+regular+
                              "; win="+pct(zipSize1-bestZipSize, zipSize1));
@@ -400,7 +400,7 @@ class CodingChooser {
                 // Mark as already visited:
                 c.searchOrder = -1;
                 if (verbose > 1 && c.coding == regular) {
-                    Utils.log.info("regular coding cannot represent ["+min+".."+max+"]: "+regular);
+                    Pack200Logger.log.info("regular coding cannot represent ["+min+".."+max+"]: "+regular);
                 }
                 continue;
             }
@@ -411,7 +411,7 @@ class CodingChooser {
         if (regularChoice == null && regular.canRepresent(min, max)) {
             regularChoice = makeExtraChoice(regular);
             if (verbose > 1) {
-                Utils.log.info("*** regular choice is extra: "+regularChoice.coding);
+                Pack200Logger.log.info("*** regular choice is extra: "+regularChoice.coding);
             }
         }
         if (regularChoice == null) {
@@ -423,17 +423,17 @@ class CodingChooser {
                 }
             }
             if (verbose > 1) {
-                Utils.log.info("*** regular choice does not apply "+regular);
-                Utils.log.info("    using instead "+regularChoice.coding);
+                Pack200Logger.log.info("*** regular choice does not apply "+regular);
+                Pack200Logger.log.info("    using instead "+regularChoice.coding);
             }
         }
         if (verbose > 2) {
-            Utils.log.info("chooser: #choices="+numChoices+" ["+min+".."+max+"]");
+            Pack200Logger.log.info("chooser: #choices="+numChoices+" ["+min+".."+max+"]");
             if (verbose > 4) {
                 for (int i = 0; i < choices.length; i++) {
                     Choice c = choices[i];
                     if (c.searchOrder >= 0)
-                        Utils.log.info("  "+c);
+                        Pack200Logger.log.info("  "+c);
                 }
             }
         }
@@ -445,7 +445,7 @@ class CodingChooser {
     // min distance to all previously evaluated choices, in this range.
     private Choice findChoiceNear(Choice near, int dhi, int dlo) {
         if (verbose > 5)
-            Utils.log.info("findChoice "+dhi+".."+dlo+" near: "+near);
+            Pack200Logger.log.info("findChoice "+dhi+".."+dlo+" near: "+near);
         int[] distance = near.distance;
         Choice found = null;
         for (int i = 0; i < choices.length; i++) {
@@ -457,14 +457,14 @@ class CodingChooser {
                 // Try also to keep min-distance from other guys in bounds:
                 if (c.minDistance >= dlo && c.minDistance <= dhi) {
                     if (verbose > 5)
-                        Utils.log.info("findChoice => good "+c);
+                        Pack200Logger.log.info("findChoice => good "+c);
                     return c;
                 }
                 found = c;
             }
         }
         if (verbose > 5)
-            Utils.log.info("findChoice => found "+found);
+            Pack200Logger.log.info("findChoice => found "+found);
         return found;
     }
 
@@ -493,7 +493,7 @@ class CodingChooser {
             assert(c.byteSize == c.histSize);  // models should agree
         }
         if (verbose > 4) {
-            Utils.log.info("evaluated "+c);
+            Pack200Logger.log.info("evaluated "+c);
         }
     }
 
@@ -501,7 +501,7 @@ class CodingChooser {
         assert(zipSize > 0 && byteSize > 0);
         boolean better = (zipSize < bestZipSize);
         if (verbose > 3)
-            Utils.log.info("computed size "+c+" "+byteSize+"/zs="+zipSize+
+            Pack200Logger.log.info("computed size "+c+" "+byteSize+"/zs="+zipSize+
                              ((better && bestMethod != null)?
                               (" better by "+
                                pct(bestZipSize - zipSize, zipSize)): ""));
@@ -527,7 +527,7 @@ class CodingChooser {
                 continue;
             int d = distance[i];
             if (verbose > 5)
-                Utils.log.info("evaluate dist "+d+" to "+c2);
+                Pack200Logger.log.info("evaluate dist "+d+" to "+c2);
             int mind = c2.minDistance;
             if (mind > d)
                 c2.minDistance = mind = d;
@@ -537,7 +537,7 @@ class CodingChooser {
         // Now maxd has the distance of the farthest outlier
         // from all evaluated choices.
         if (verbose > 5)
-            Utils.log.info("evaluate maxd => "+maxd);
+            Pack200Logger.log.info("evaluate maxd => "+maxd);
         return maxd;
     }
 
@@ -706,7 +706,7 @@ class CodingChooser {
                     if (targetLowFVC < 0)
                         targetLowFVC = fvcount;
                     if (verbose > 4)
-                        Utils.log.info("better pop-size at fvc="+fvcount+
+                        Pack200Logger.log.info("better pop-size at fvc="+fvcount+
                                          " by "+pct(bestPopSize-currentSize,
                                                     bestPopSize));
                 }
@@ -718,7 +718,7 @@ class CodingChooser {
             if (verbose > 1) {
                 // Complete loss.
                 if (verbose > 1)
-                    Utils.log.info("no good pop-size; best was "+
+                    Pack200Logger.log.info("no good pop-size; best was "+
                                      bestPopSize+" at "+bestPopFVC+
                                      " worse by "+
                                      pct(bestPopSize-bestByteSize,
@@ -727,7 +727,7 @@ class CodingChooser {
             return;
         }
         if (verbose > 1)
-            Utils.log.info("initial best pop-size at fvc="+bestPopFVC+
+            Pack200Logger.log.info("initial best pop-size at fvc="+bestPopFVC+
                              " in ["+targetLowFVC+".."+targetHighFVC+"]"+
                              " by "+pct(bestByteSize-bestPopSize,
                                         bestByteSize));
@@ -808,11 +808,11 @@ class CodingChooser {
         }
         if (allFits.size() > maxFits) {
             if (verbose > 4)
-                Utils.log.info("allFits before clip: "+allFits);
+                Pack200Logger.log.info("allFits before clip: "+allFits);
             allFits.subList(maxFits, allFits.size()).clear();
         }
         if (verbose > 3)
-            Utils.log.info("allFits: "+allFits);
+            Pack200Logger.log.info("allFits: "+allFits);
         for (Coding tc : allFits) {
             boolean packToMax = false;
             if (tc.S() == PACK_TO_MAX_S) {
@@ -844,12 +844,12 @@ class CodingChooser {
             noteSizes(pop, tcsizes[BYTE_SIZE], BAND_HEADER+tcsizes[ZIP_SIZE]);
         }
         if (verbose > 3) {
-            Utils.log.info("measured best pop, size="+bestByteSize+
+            Pack200Logger.log.info("measured best pop, size="+bestByteSize+
                              "/zs="+bestZipSize+
                              " better by "+
                              pct(oldZipSize-bestZipSize, oldZipSize));
             if (bestZipSize < oldZipSize) {
-                Utils.log.info(">>> POP WINS BY "+
+                Pack200Logger.log.info(">>> POP WINS BY "+
                                  (oldZipSize - bestZipSize));
             }
         }
@@ -873,9 +873,9 @@ class CodingChooser {
         }
         int fVlen = pop.fVlen;
         if (verbose > 2) {
-            Utils.log.info("computePopSizePrivate fvlen="+fVlen+
+            Pack200Logger.log.info("computePopSizePrivate fvlen="+fVlen+
                              " tc="+pop.tokenCoding);
-            Utils.log.info("{ //BEGIN");
+            Pack200Logger.log.info("{ //BEGIN");
         }
 
         // Find good coding choices for the token and unfavored sequences.
@@ -884,16 +884,16 @@ class CodingChooser {
         int[] tokens = vals[0];
         int[] unfavoredValues = vals[1];
         if (verbose > 2)
-            Utils.log.info("-- refine on fv["+fVlen+"] fc="+favoredCoding);
+            Pack200Logger.log.info("-- refine on fv["+fVlen+"] fc="+favoredCoding);
         pop.setFavoredCoding(popHelper.choose(favoredValues, 1, 1+fVlen, favoredCoding));
         if (pop.tokenCoding instanceof Coding &&
             (stress == null || stress.nextBoolean())) {
             if (verbose > 2)
-                Utils.log.info("-- refine on tv["+tokens.length+"] tc="+pop.tokenCoding);
+                Pack200Logger.log.info("-- refine on tv["+tokens.length+"] tc="+pop.tokenCoding);
             CodingMethod tc = popHelper.choose(tokens, (Coding) pop.tokenCoding);
             if (tc != pop.tokenCoding) {
                 if (verbose > 2)
-                    Utils.log.info(">>> refined tc="+tc);
+                    Pack200Logger.log.info(">>> refined tc="+tc);
                 pop.setTokenCoding(tc);
             }
         }
@@ -901,11 +901,11 @@ class CodingChooser {
             pop.setUnfavoredCoding(null);
         else {
             if (verbose > 2)
-                Utils.log.info("-- refine on uv["+unfavoredValues.length+"] uc="+pop.unfavoredCoding);
+                Pack200Logger.log.info("-- refine on uv["+unfavoredValues.length+"] uc="+pop.unfavoredCoding);
             pop.setUnfavoredCoding(popHelper.choose(unfavoredValues, unfavoredCoding));
         }
         if (verbose > 3) {
-            Utils.log.info("finish computePopSizePrivate fvlen="+fVlen+
+            Pack200Logger.log.info("finish computePopSizePrivate fvlen="+fVlen+
                              " fc="+pop.favoredCoding+
                              " tc="+pop.tokenCoding+
                              " uc="+pop.unfavoredCoding);
@@ -919,10 +919,10 @@ class CodingChooser {
             }
             sb.append('\n');
             sb.append("}");
-            Utils.log.info(sb.toString());
+            Pack200Logger.log.info(sb.toString());
         }
         if (verbose > 2) {
-            Utils.log.info("} //END");
+            Pack200Logger.log.info("} //END");
         }
         if (stress != null) {
             return null;  // do not bother with size computation
@@ -1030,7 +1030,7 @@ class CodingChooser {
             for (int i = 0; i < meshes.length; i++) {
                 System.out.print(" " + meshes[i] + "(" + threshes[i] + ")");
             }
-            Utils.log.info(" }");
+            Pack200Logger.log.info(" }");
         }
         if (runHelper == null) {
             runHelper = new CodingChooser(effort, allCodingChoices);
@@ -1073,10 +1073,10 @@ class CodingChooser {
                     }
                     int nexti = bend;
                     if (verbose > 2) {
-                        Utils.log.info("bulge at "+i+"["+(bend-i)+"] of "+
+                        Pack200Logger.log.info("bulge at "+i+"["+(bend-i)+"] of "+
                                          pct(bsize - avgSize*(bend-i),
                                              avgSize*(bend-i)));
-                        Utils.log.info("{ //BEGIN");
+                        Pack200Logger.log.info("{ //BEGIN");
                     }
                     CodingMethod begcm, midcm, endcm;
                     midcm = runHelper.choose(this.values,
@@ -1098,7 +1098,7 @@ class CodingChooser {
                                                  plainCoding);
                     }
                     if (verbose > 2)
-                        Utils.log.info("} //END");
+                        Pack200Logger.log.info("} //END");
                     if (begcm == midcm && i > 0 &&
                         AdaptiveCoding.isCodableLength(bend)) {
                         i = 0;
@@ -1133,7 +1133,7 @@ class CodingChooser {
         }
         if (verbose > 3) {
             if (bestZipSize < oldZipSize) {
-                Utils.log.info(">>> RUN WINS BY "+
+                Pack200Logger.log.info(">>> RUN WINS BY "+
                                  (oldZipSize - bestZipSize));
             }
         }
